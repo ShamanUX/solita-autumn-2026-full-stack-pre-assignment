@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@feathersjs/feathers": "^5.0.49",
+    "typescript": "^7.0.2"
+  }
+}
