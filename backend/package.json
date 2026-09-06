@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@feathersjs/errors": "^5.0.49",
     "@feathersjs/feathers": "^5.0.49",
     "@feathersjs/koa": "^5.0.49",
     "knex": "^3.3.0",
