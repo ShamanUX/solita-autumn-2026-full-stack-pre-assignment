@@ -138,6 +138,7 @@ export class DailyStatisticsService {
     params?: Params<Record<string, unknown>>,
   ): Promise<DailyStatisticsPage> {
     const query = parseQuery(params?.query)
+    console.debug('Fetching daily statistics from database', query)
     const filteredRows = this.database('electricitydata').whereNotNull('date')
 
     if (query.from) filteredRows.where('date', '>=', query.from)

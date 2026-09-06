@@ -29,7 +29,9 @@ export async function getDailyStatistics(
   parameters.set('sortField', query.sortField)
   parameters.set('sortDirection', query.sortDirection)
 
-  const response = await fetch(`/daily-statistics?${parameters}`)
+  const url = `/daily-statistics?${parameters}`
+  console.debug('Fetching daily statistics', url)
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error(`Daily statistics request failed with ${response.status}`)
