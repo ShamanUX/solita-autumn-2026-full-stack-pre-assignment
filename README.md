@@ -34,11 +34,26 @@ uses port `5432` inside Docker. `POSTGRES_PORT` can override the exposed port;
 set the same port in `DATABASE_URL` when running the backend directly on the
 host.
 
+### Daily statistics API
+
+`GET /daily-statistics` returns daily averages calculated from the available
+hourly production, consumption, and price values. The response contains a
+`data` array and the total number of matching dates in `total`.
+
+The endpoint accepts inclusive `from` and `to` dates in `YYYY-MM-DD` format,
+zero-based `page`, `pageSize` up to 100, `sortField`, and `sortDirection`.
+Supported sort fields are `date`, `averageProduction`, `averageConsumption`,
+and `averagePrice`. For example:
+
+```text
+http://localhost:3030/daily-statistics?from=2024-09-01&to=2024-09-30&page=0&pageSize=10&sortField=date&sortDirection=desc
+```
+
 ## Running the frontend
 
 The React frontend currently uses a small set of temporary daily-statistics
-fixtures while the corresponding backend service is developed. Start the Vite
-development server with:
+fixtures matching the backend response contract. Start the Vite development
+server with:
 
 ```sh
 npm install
@@ -46,8 +61,8 @@ npm run dev:frontend
 ```
 
 Open <http://localhost:5173/>. The fixture provider supports the same date
-filtering, sorting, and pagination behavior expected from the future API. Run
-the frontend production build and tests with:
+filtering, sorting, and pagination behavior as the API. Run the frontend
+production build and tests with:
 
 ```sh
 npm run build --workspace frontend
