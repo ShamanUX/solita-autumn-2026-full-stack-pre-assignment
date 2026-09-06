@@ -6,7 +6,6 @@ import {
   Alert,
   Box,
   Button,
-  Chip,
   Container,
   Divider,
   Paper,
@@ -207,12 +206,6 @@ export function App() {
               Finnish electricity data
             </Typography>
           </Stack>
-          <Chip
-            label="Fixture preview"
-            size="small"
-            variant="outlined"
-            color="primary"
-          />
         </Stack>
       </Container>
 

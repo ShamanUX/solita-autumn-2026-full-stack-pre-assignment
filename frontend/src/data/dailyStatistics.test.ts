@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getDailyStatistics,
@@ -14,35 +14,68 @@ const defaultQuery: DailyStatisticsQuery = {
   sortDirection: 'asc',
 }
 
+const page = {
+  data: [
+    {
+      date: '2024-09-01',
+      averageProduction: 29941,
+      averageConsumption: 4033477.7,
+      averagePrice: 1.044,
+    },
+  ],
+  total: 1,
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
 describe('getDailyStatistics', () => {
-  it('filters dates inclusively', async () => {
-    const result = await getDailyStatistics({
-      ...defaultQuery,
-      from: '2024-09-10',
-      to: '2024-09-12',
+  it('requests the backend with filters, sorting, and pagination', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(page),
     })
+    vi.stubGlobal('fetch', fetchMock)
 
-    expect(result.total).toBe(3)
-    expect(result.data.map(({ date }) => date)).toEqual([
-      '2024-09-10',
-      '2024-09-11',
-      '2024-09-12',
-    ])
-  })
-
-  it('sorts and paginates numeric fields', async () => {
     const result = await getDailyStatistics({
       ...defaultQuery,
+      from: '2024-09-01',
+      to: '2024-09-30',
       page: 1,
       pageSize: 5,
       sortField: 'averagePrice',
       sortDirection: 'desc',
     })
 
-    expect(result.total).toBe(20)
-    expect(result.data).toHaveLength(5)
-    expect(result.data.map(({ averagePrice }) => averagePrice)).toEqual([
-      9.692, 9.188, 9.087, 8.528, 7.907,
-    ])
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/daily-statistics?from=2024-09-01&to=2024-09-30&page=1&pageSize=5&sortField=averagePrice&sortDirection=desc',
+    )
+    expect(result).toEqual(page)
+  })
+
+  it('omits empty date filters', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(page),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await getDailyStatistics(defaultQuery)
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/daily-statistics?page=0&pageSize=10&sortField=date&sortDirection=asc',
+    )
+  })
+
+  it('rejects unsuccessful responses', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: false, status: 503 }),
+    )
+
+    await expect(getDailyStatistics(defaultQuery)).rejects.toThrow(
+      'Daily statistics request failed with 503',
+    )
   })
 })
