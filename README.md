@@ -34,6 +34,26 @@ uses port `5432` inside Docker. `POSTGRES_PORT` can override the exposed port;
 set the same port in `DATABASE_URL` when running the backend directly on the
 host.
 
+## Running the frontend
+
+The React frontend currently uses a small set of temporary daily-statistics
+fixtures while the corresponding backend service is developed. Start the Vite
+development server with:
+
+```sh
+npm install
+npm run dev:frontend
+```
+
+Open <http://localhost:5173/>. The fixture provider supports the same date
+filtering, sorting, and pagination behavior expected from the future API. Run
+the frontend production build and tests with:
+
+```sh
+npm run build --workspace frontend
+npm run test --workspace frontend
+```
+
 ## Use of Generative AI
 
 Generative AI is used as a development assistant.
@@ -49,3 +69,4 @@ So far, AI has been used to:
 - Plan folder structure -> kept Docker files in root, add frontend/ and backend/ folders, with tsconfig file for each.
 - implement and verify the initial Feathers database health check and Docker integration.
 - Plan PR implementation steps. I direct the AI to implement logical parts of the software as separate PRs.
+- bootstrap, implement, and test the fixture-backed React statistics interface.
