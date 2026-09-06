@@ -2,6 +2,8 @@ import { feathers } from '@feathersjs/feathers'
 import { bodyParser, errorHandler, koa, rest } from '@feathersjs/koa'
 import knex, { type Knex } from 'knex'
 
+import { DailyStatisticsService } from './daily-statistics.js'
+
 export interface HealthStatus {
   status: 'ok'
   database: 'connected'
@@ -25,6 +27,7 @@ class HealthService {
 }
 
 interface ServiceTypes {
+  'daily-statistics': DailyStatisticsService
   health: HealthService
 }
 
@@ -45,6 +48,11 @@ export function createApp(databaseUrl = process.env.DATABASE_URL ?? defaultDatab
   app.use(errorHandler())
   app.use(bodyParser())
   app.configure(rest())
+  app.use(
+    'daily-statistics',
+    new DailyStatisticsService(postgresqlClient),
+    { methods: ['find'] },
+  )
   app.use('health', new HealthService(postgresqlClient), {
     methods: ['find']
   })
