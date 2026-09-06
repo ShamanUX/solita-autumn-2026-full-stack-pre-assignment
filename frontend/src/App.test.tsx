@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { App } from './App.js'
 import { getDailyStatistics } from './data/dailyStatistics.js'
@@ -11,15 +11,33 @@ vi.mock('./data/dailyStatistics.js', async (importOriginal) => {
 
   return {
     ...actual,
-    getDailyStatistics: vi.fn(actual.getDailyStatistics),
+    getDailyStatistics: vi.fn(),
   }
 })
 
 const mockedGetDailyStatistics = vi.mocked(getDailyStatistics)
 
+const statistic = {
+  date: '2024-09-20',
+  averageProduction: 30395.6,
+  averageConsumption: 4620873,
+  averagePrice: 9.087,
+}
+
 afterEach(() => {
   cleanup()
-  mockedGetDailyStatistics.mockClear()
+  mockedGetDailyStatistics.mockReset()
+})
+
+beforeEach(() => {
+  mockedGetDailyStatistics.mockImplementation(({ from }) => {
+    if (from === '2024-10-01') return Promise.resolve({ data: [], total: 0 })
+
+    return Promise.resolve({
+      data: [statistic],
+      total: from === '2024-09-15' ? 6 : 20,
+    })
+  })
 })
 
 describe('App', () => {

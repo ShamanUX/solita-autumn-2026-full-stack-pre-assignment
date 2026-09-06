@@ -1,6 +1,6 @@
 # Architecture and Installation Plan
 
-Status: daily statistics API implemented
+Status: daily statistics API and API-backed frontend implemented
 
 ## Goals
 
