@@ -2,12 +2,14 @@
   "name": "electricity-data-application",
   "private": true,
   "workspaces": [
-    "backend"
+    "backend",
+    "frontend"
   ],
   "scripts": {
-    "build": "npm run build --workspace backend",
+    "build": "npm run build --workspaces --if-present",
     "dev": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
     "start": "npm run start --workspace backend",
-    "test": "npm run test --workspace backend"
+    "test": "npm run test --workspaces --if-present"
   }
 }
