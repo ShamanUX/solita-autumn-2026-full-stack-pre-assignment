@@ -1,6 +1,6 @@
 # Architecture and Installation Plan
 
-Status: initial plan, before implementation
+Status: backend connection skeleton implemented
 
 ## Goals
 
@@ -14,3 +14,10 @@ does not require.
 React, TypeScript, Node.js stack.
 
 We're going to use Feathers.js as our full-stack framework to handle API routing and database connectivity out of the box.
+
+## Backend integration
+
+The Feathers TypeScript backend will live in `backend/` and connect to the
+provided PostgreSQL database through Knex. Docker Compose will run it as a
+separate Node.js container after PostgreSQL is healthy. A health endpoint and
+integration test will verify the database connection.
