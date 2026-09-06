@@ -51,18 +51,17 @@ http://localhost:3030/daily-statistics?from=2024-09-01&to=2024-09-30&page=0&page
 
 ## Running the frontend
 
-The React frontend currently uses a small set of temporary daily-statistics
-fixtures matching the backend response contract. Start the Vite development
-server with:
+The React frontend loads daily statistics from the backend through the Vite
+development proxy. Start the Docker services as described above, then start the
+frontend with:
 
 ```sh
 npm install
 npm run dev:frontend
 ```
 
-Open <http://localhost:5173/>. The fixture provider supports the same date
-filtering, sorting, and pagination behavior as the API. Run the frontend
-production build and tests with:
+Open <http://localhost:5173/>. Date filtering, sorting, and pagination are
+handled by the API. Run the frontend production build and tests with:
 
 ```sh
 npm run build --workspace frontend
@@ -85,3 +84,4 @@ So far, AI has been used to:
 - implement and verify the initial Feathers database health check and Docker integration.
 - Plan PR implementation steps. I direct the AI to implement logical parts of the software as separate PRs.
 - bootstrap, implement, and test the fixture-backed React statistics interface.
+- replace the frontend fixtures with the backend API integration and update its tests.
