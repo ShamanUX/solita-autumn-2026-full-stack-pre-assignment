@@ -1,6 +1,13 @@
 {
-  "dependencies": {
-    "@feathersjs/feathers": "^5.0.49",
-    "typescript": "^7.0.2"
+  "name": "electricity-data-application",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace backend",
+    "dev": "npm run dev --workspace backend",
+    "start": "npm run start --workspace backend",
+    "test": "npm run test --workspace backend"
   }
 }
