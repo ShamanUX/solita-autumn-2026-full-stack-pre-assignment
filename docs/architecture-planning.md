@@ -27,3 +27,17 @@ date and calculates averages for the available production, consumption, and
 price observations. Its REST endpoint provides inclusive date filtering,
 server-side pagination, and allowlisted single-column ordering. Missing
 measurements remain `null` rather than being treated as zero.
+
+## Frontend architecture
+
+The React frontend will feature no routing for this usecase. We follow the Container and Presentational Component pattern, separating logic and visual components.
+
+Data flows down from the container through props, and user actions flow back up
+through callbacks. This keeps API and state transitions separate from rendering
+without introducing a global state library for the current scope.
+
+Tests follow the same boundaries: container tests cover data loading and state
+transitions, direct component tests cover presentational behavior and callbacks,
+and data-module tests cover HTTP request construction and failures. `App` does
+not need a separate behavioral test while it remains a one-line composition
+root.

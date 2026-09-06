@@ -2,12 +2,12 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { App } from './App.js'
-import { getDailyStatistics } from './data/dailyStatistics.js'
+import { getDailyStatistics } from '../data/dailyStatistics.js'
+import { DailyStatisticsContainer } from './DailyStatisticsContainer.js'
 
-vi.mock('./data/dailyStatistics.js', async (importOriginal) => {
+vi.mock('../data/dailyStatistics.js', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('./data/dailyStatistics.js')>()
+    await importOriginal<typeof import('../data/dailyStatistics.js')>()
 
   return {
     ...actual,
@@ -30,29 +30,34 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  mockedGetDailyStatistics.mockImplementation(({ from }) => {
-    if (from === '2024-10-01') return Promise.resolve({ data: [], total: 0 })
-
-    return Promise.resolve({
+  mockedGetDailyStatistics.mockImplementation(({ from }) =>
+    Promise.resolve({
       data: [statistic],
       total: from === '2024-09-15' ? 6 : 20,
-    })
-  })
+    }),
+  )
 })
 
-describe('App', () => {
-  it('loads and displays the available daily statistics', async () => {
-    render(<App />)
+describe('DailyStatisticsContainer', () => {
+  it('loads statistics with the initial query', async () => {
+    render(<DailyStatisticsContainer />)
 
-    expect(screen.getByText('Finnish electricity data')).toBeInTheDocument()
     expect(screen.getByText('Loading records...')).toBeInTheDocument()
     expect(await screen.findByText('20 days found')).toBeInTheDocument()
     expect(screen.getByText('20 Sept 2024')).toBeInTheDocument()
+    expect(mockedGetDailyStatistics).toHaveBeenCalledWith({
+      from: '',
+      to: '',
+      page: 0,
+      pageSize: 10,
+      sortField: 'date',
+      sortDirection: 'desc',
+    })
   })
 
   it('applies and clears an inclusive date range', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<DailyStatisticsContainer />)
     await screen.findByText('20 days found')
 
     fireEvent.change(screen.getByLabelText('From'), {
@@ -71,49 +76,10 @@ describe('App', () => {
     expect(screen.getByLabelText('From')).toHaveValue('')
   })
 
-  it('rejects a date range in reverse order', async () => {
-    render(<App />)
-    await screen.findByText('20 days found')
-
-    fireEvent.change(screen.getByLabelText('From'), {
-      target: { value: '2024-09-20' },
-    })
-    fireEvent.change(screen.getByLabelText('To'), {
-      target: { value: '2024-09-10' },
-    })
-
-    expect(
-      screen.getByText('To date must follow from date'),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Apply dates' })).toBeDisabled()
-  })
-
-  it('shows an empty state when no dates match', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await screen.findByText('20 days found')
-
-    fireEvent.change(screen.getByLabelText('From'), {
-      target: { value: '2024-10-01' },
-    })
-    await user.click(screen.getByRole('button', { name: 'Apply dates' }))
-
-    expect(await screen.findByText('0 days found')).toBeInTheDocument()
-    expect(await screen.findByText('No days in this range')).toBeInTheDocument()
-  })
-
-  it('keeps the loading state visible while data is pending', () => {
-    mockedGetDailyStatistics.mockReturnValueOnce(new Promise(() => undefined))
-
-    render(<App />)
-
-    expect(screen.getByText('Loading records...')).toBeInTheDocument()
-  })
-
-  it('shows a recoverable error when loading fails', async () => {
+  it('retries a failed request', async () => {
     const user = userEvent.setup()
     mockedGetDailyStatistics.mockRejectedValueOnce(new Error('Unavailable'))
-    render(<App />)
+    render(<DailyStatisticsContainer />)
 
     expect(
       await screen.findByText('Daily statistics could not be loaded.'),
@@ -122,5 +88,6 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Retry' }))
 
     expect(await screen.findByText('20 days found')).toBeInTheDocument()
+    expect(mockedGetDailyStatistics).toHaveBeenCalledTimes(2)
   })
 })
