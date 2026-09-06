@@ -34,6 +34,21 @@ uses port `5432` inside Docker. `POSTGRES_PORT` can override the exposed port;
 set the same port in `DATABASE_URL` when running the backend directly on the
 host.
 
+### Daily statistics API
+
+`GET /daily-statistics` returns daily averages calculated from the available
+hourly production, consumption, and price values. The response contains a
+`data` array and the total number of matching dates in `total`.
+
+The endpoint accepts inclusive `from` and `to` dates in `YYYY-MM-DD` format,
+zero-based `page`, `pageSize` up to 100, `sortField`, and `sortDirection`.
+Supported sort fields are `date`, `averageProduction`, `averageConsumption`,
+and `averagePrice`. For example:
+
+```text
+http://localhost:3030/daily-statistics?from=2024-09-01&to=2024-09-30&page=0&pageSize=10&sortField=date&sortDirection=desc
+```
+
 ## Use of Generative AI
 
 Generative AI is used as a development assistant.
