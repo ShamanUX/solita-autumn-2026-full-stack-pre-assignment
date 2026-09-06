@@ -1,6 +1,6 @@
 # Architecture and Installation Plan
 
-Status: daily statistics API and fixture-backed frontend implemented
+Status: backend connection skeleton implemented
 
 ## Goals
 
@@ -21,9 +21,3 @@ The Feathers TypeScript backend will live in `backend/` and connect to the
 provided PostgreSQL database through Knex. Docker Compose will run it as a
 separate Node.js container after PostgreSQL is healthy. A health endpoint and
 integration test will verify the database connection.
-
-The read-only `daily-statistics` Feathers service groups the source rows by
-date and calculates averages for the available production, consumption, and
-price observations. Its REST endpoint provides inclusive date filtering,
-server-side pagination, and allowlisted single-column ordering. Missing
-measurements remain `null` rather than being treated as zero.
