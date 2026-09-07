@@ -159,6 +159,15 @@ describe('DailyStatisticsContainer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Graph' }))
     expect(screen.queryByLabelText('From')).not.toBeInTheDocument()
+
+    await waitFor(() =>
+      expect(mockedGetDailyStatistics).toHaveBeenCalledTimes(3),
+    )
+    await user.click(screen.getByRole('button', { name: 'Data table' }))
+
+    expect(screen.getByLabelText('From')).toHaveValue('2024-09-01')
+    expect(screen.getByLabelText('To')).toHaveValue('2024-09-30')
+    expect(mockedGetDailyStatistics).toHaveBeenCalledTimes(3)
   })
 
   it('loads September 2024 as the default graph month', async () => {
@@ -236,6 +245,15 @@ describe('DailyStatisticsContainer', () => {
       'aria-pressed',
       'true',
     )
+    expect(screen.getByText('Daily statistics by month.')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(mockedGetDailyStatistics).toHaveBeenCalledTimes(2),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Data table' }))
+    await user.click(screen.getByRole('button', { name: 'Graph' }))
+
+    expect(mockedGetDailyStatistics).toHaveBeenCalledTimes(2)
   })
 
   it('opens a day and returns to the unchanged overview', async () => {

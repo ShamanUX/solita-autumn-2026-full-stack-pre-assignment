@@ -42,14 +42,16 @@ The React frontend will feature no routing for this usecase. We follow the Conta
 sorting, and display-mode state. The table requests server-paginated sets of 10
 daily averages with its independently applied optional date range. The graph
 defaults to September 2024, and each selected month is loaded in one bounded API
-request containing at most 31 daily averages.
+request containing at most 31 daily averages. Table and graph results have
+independent state and are retained across display changes, so switching modes
+does not repeat an unchanged query.
 `DailyStatisticsView` composes controlled presentational components.
 
-`DailyStatisticsDisplay` provides the table/graph switch and shared loading and
-error states. Its MUI month picker is shown only for the graph, and its date
-range filter is shown only for the table. The table uses server-side pagination
-and sorting, while the graph keeps electricity values and price on separate
-axes because they use different scales.
+`DailyStatisticsDisplay` provides the table/graph switch and renders the active
+mode's loading and error state. Its MUI month picker is shown only for the graph,
+and its date range filter is shown only for the table. The table uses server-side
+pagination and sorting, while the graph keeps electricity values and price on
+separate axes because they use different scales.
 
 Selecting a table action or a plotted graph day opens `SingleDayView` in the
 same content panel. The container loads the selected date independently and

@@ -25,8 +25,16 @@ function getMonthEnd(month: string) {
 
 export function DailyStatisticsContainer() {
   const [month, setMonth] = useState('2024-09')
-  const [rows, setRows] = useState<DailyStatistic[]>([])
-  const [rowCount, setRowCount] = useState(0)
+  const [tableRows, setTableRows] = useState<DailyStatistic[]>([])
+  const [tableRowCount, setTableRowCount] = useState(0)
+  const [tableLoading, setTableLoading] = useState(true)
+  const [tableError, setTableError] = useState(false)
+  const [tableLoadAttempt, setTableLoadAttempt] = useState(0)
+  const [graphRows, setGraphRows] = useState<DailyStatistic[]>([])
+  const [graphLoading, setGraphLoading] = useState(false)
+  const [graphError, setGraphError] = useState(false)
+  const [graphLoadAttempt, setGraphLoadAttempt] = useState(0)
+  const [graphActivated, setGraphActivated] = useState(false)
   const [pagination, setPagination] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 10,
@@ -34,9 +42,6 @@ export function DailyStatisticsContainer() {
   const [sortModel, setSortModel] = useState<GridSortModel>([
     { field: 'date', sort: 'desc' },
   ])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [loadAttempt, setLoadAttempt] = useState(0)
   const [display, setDisplay] = useState<StatisticsDisplay>('table')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [detail, setDetail] = useState<DailyStatisticDetail | null>(null)
@@ -55,47 +60,65 @@ export function DailyStatisticsContainer() {
   useEffect(() => {
     let current = true
 
-    setLoading(true)
-    setError(false)
+    setTableLoading(true)
+    setTableError(false)
 
     const selectedSort = sortModel[0]
-    const query =
-      display === 'table'
-        ? {
-            from: appliedDateRange.from,
-            to: appliedDateRange.to,
-            page: pagination.page,
-            pageSize: 10,
-            sortField: (selectedSort?.field ?? 'date') as StatisticSortField,
-            sortDirection: selectedSort?.sort ?? ('desc' as const),
-          }
-        : {
-            from: `${month}-01`,
-            to: getMonthEnd(month),
-            page: 0,
-            pageSize: 31,
-            sortField: 'date' as StatisticSortField,
-            sortDirection: 'asc' as const,
-          }
-
-    void getDailyStatistics(query)
+    void getDailyStatistics({
+      from: appliedDateRange.from,
+      to: appliedDateRange.to,
+      page: pagination.page,
+      pageSize: 10,
+      sortField: (selectedSort?.field ?? 'date') as StatisticSortField,
+      sortDirection: selectedSort?.sort ?? ('desc' as const),
+    })
       .then((result) => {
         if (!current) return
 
-        setRows(result.data)
-        setRowCount(result.total)
+        setTableRows(result.data)
+        setTableRowCount(result.total)
       })
       .catch(() => {
-        if (current) setError(true)
+        if (current) setTableError(true)
       })
       .finally(() => {
-        if (current) setLoading(false)
+        if (current) setTableLoading(false)
       })
 
     return () => {
       current = false
     }
-  }, [appliedDateRange, display, loadAttempt, month, pagination.page, sortModel])
+  }, [appliedDateRange, pagination.page, sortModel, tableLoadAttempt])
+
+  useEffect(() => {
+    if (!graphActivated) return
+
+    let current = true
+    setGraphLoading(true)
+    setGraphError(false)
+
+    void getDailyStatistics({
+      from: `${month}-01`,
+      to: getMonthEnd(month),
+      page: 0,
+      pageSize: 31,
+      sortField: 'date',
+      sortDirection: 'asc',
+    })
+      .then((result) => {
+        if (current) setGraphRows(result.data)
+      })
+      .catch(() => {
+        if (current) setGraphError(true)
+      })
+      .finally(() => {
+        if (current) setGraphLoading(false)
+      })
+
+    return () => {
+      current = false
+    }
+  }, [graphActivated, graphLoadAttempt, month])
 
   useEffect(() => {
     if (selectedDate === null) return
@@ -122,6 +145,7 @@ export function DailyStatisticsContainer() {
   }, [detailLoadAttempt, selectedDate])
 
   function changeMonth(nextMonth: string) {
+    setGraphLoading(true)
     setMonth(nextMonth)
   }
 
@@ -130,12 +154,24 @@ export function DailyStatisticsContainer() {
     setPagination((current) => ({ ...current, page: 0 }))
   }
 
+  function changeDisplay(nextDisplay: StatisticsDisplay) {
+    if (nextDisplay === 'graph' && !graphActivated) {
+      setGraphLoading(true)
+      setGraphActivated(true)
+    }
+    setDisplay(nextDisplay)
+  }
+
+  const rows = display === 'table' ? tableRows : graphRows
+  const loading = display === 'table' ? tableLoading : graphLoading
+  const error = display === 'table' ? tableError : graphError
+
   return (
     <DailyStatisticsView
       month={month}
       latestMonth=""
       rows={rows}
-      rowCount={rowCount}
+      rowCount={tableRowCount}
       pagination={pagination}
       sortModel={sortModel}
       loading={loading}
@@ -162,8 +198,14 @@ export function DailyStatisticsContainer() {
       }}
       onPaginationChange={setPagination}
       onSortChange={changeSort}
-      onRetry={() => setLoadAttempt((value) => value + 1)}
-      onDisplayChange={setDisplay}
+      onRetry={() => {
+        if (display === 'table') {
+          setTableLoadAttempt((value) => value + 1)
+        } else {
+          setGraphLoadAttempt((value) => value + 1)
+        }
+      }}
+      onDisplayChange={changeDisplay}
       onDaySelect={setSelectedDate}
       onDetailBack={() => setSelectedDate(null)}
       onDetailRetry={() => setDetailLoadAttempt((value) => value + 1)}

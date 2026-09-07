@@ -82,7 +82,9 @@ export function DailyStatisticsDisplay({
         >
           <Box>
             <Typography variant="h2" sx={{ fontSize: '1.5rem' }}>
-              Daily statistics
+              {display === 'graph'
+                ? 'Daily statistics by month.'
+                : 'Daily statistics'}
             </Typography>
             <Typography
               variant="body2"
