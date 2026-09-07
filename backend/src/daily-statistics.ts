@@ -159,6 +159,10 @@ function toNumber(value: string | null): number | null {
   return value === null ? null : Number(value)
 }
 
+function consumptionToMWh(value: string | null): number | null {
+  return value === null ? null : Number(value) / 1000
+}
+
 function round(value: number, fractionDigits: number): number {
   const multiplier = 10 ** fractionDigits
   return Math.round((value + Number.EPSILON) * multiplier) / multiplier
@@ -217,7 +221,7 @@ export class DailyStatisticsService {
     const hours = rows.map((row) => ({
       startTime: row.startTime,
       production: toNumber(row.production),
-      consumption: toNumber(row.consumption),
+      consumption: consumptionToMWh(row.consumption),
       price: toNumber(row.price),
     }))
     const peakConsumptionRatioHour =
@@ -258,11 +262,11 @@ export class DailyStatisticsService {
       date,
       totalProduction: sum(
         hours.map((hour) => hour.production),
-        1,
+        0,
       ),
       totalConsumption: sum(
         hours.map((hour) => hour.consumption),
-        1,
+        0,
       ),
       averagePrice: average(
         hours.map((hour) => hour.price),
@@ -288,10 +292,10 @@ export class DailyStatisticsService {
       .clone()
       .select({
         date: this.database.raw("TO_CHAR(??, 'YYYY-MM-DD')", ['date']),
-        averageProduction: this.database.raw('ROUND(AVG(??), 1)', [
+        averageProduction: this.database.raw('ROUND(AVG(??), 0)', [
           'productionamount',
         ]),
-        averageConsumption: this.database.raw('ROUND(AVG(??), 1)', [
+        averageConsumption: this.database.raw('ROUND(AVG(??) / 1000, 0)', [
           'consumptionamount',
         ]),
         averagePrice: this.database.raw('ROUND(AVG(??), 3)', ['hourlyprice']),

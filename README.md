@@ -39,6 +39,9 @@ host.
 `GET /daily-statistics` returns daily averages calculated from the available
 hourly production, consumption, and price values. The response contains a
 `data` array and the total number of matching dates in `total`.
+Production and consumption are returned in a common MWh scale: source
+consumption values are converted from kWh to MWh. Prices retain their source
+unit of c/kWh. Daily MWh averages and totals are rounded to whole numbers.
 
 The endpoint accepts inclusive `from` and `to` dates in `YYYY-MM-DD` format,
 zero-based `page`, `pageSize` up to 100, `sortField`, and `sortDirection`.
@@ -91,3 +94,4 @@ So far, AI has been used to:
 - Plan folder structure -> kept Docker files in root, add frontend/ and backend/ folders, with tsconfig file for each.
 - I direct AI to write sufficiently concise changes as separate PRs.
 - implement and test the single-day electricity statistics drill-down.
+- normalize electricity units and apply Finnish number formatting.

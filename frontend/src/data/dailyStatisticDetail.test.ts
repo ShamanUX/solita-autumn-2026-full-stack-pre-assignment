@@ -5,7 +5,7 @@ import { getDailyStatisticDetail } from './dailyStatisticDetail.js'
 const detail = {
   date: '2024-09-01',
   totalProduction: 718585,
-  totalConsumption: 96803463.9,
+  totalConsumption: 96803,
   averagePrice: 1.044,
   peakConsumptionRatioHour: null,
   cheapestHours: [],

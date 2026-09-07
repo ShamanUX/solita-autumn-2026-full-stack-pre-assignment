@@ -19,7 +19,7 @@ const page = {
     {
       date: '2024-09-01',
       averageProduction: 29941,
-      averageConsumption: 4033477.7,
+      averageConsumption: 4033,
       averagePrice: 1.044,
     },
   ],

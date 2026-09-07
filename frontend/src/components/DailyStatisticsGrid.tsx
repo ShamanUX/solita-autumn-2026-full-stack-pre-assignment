@@ -9,10 +9,10 @@ import {
 
 import type { DailyStatistic } from '../data/dailyStatistics.js'
 
-const numberFormatter = new Intl.NumberFormat('en-FI', {
-  maximumFractionDigits: 1,
+const numberFormatter = new Intl.NumberFormat('fi-FI', {
+  maximumFractionDigits: 0,
 })
-const priceFormatter = new Intl.NumberFormat('en-FI', {
+const priceFormatter = new Intl.NumberFormat('fi-FI', {
   minimumFractionDigits: 3,
   maximumFractionDigits: 3,
 })
@@ -34,7 +34,7 @@ const columns: GridColDef<DailyStatistic>[] = [
   },
   {
     field: 'averageProduction',
-    headerName: 'Production average',
+    headerName: 'Production average (MWh)',
     minWidth: 205,
     flex: 1,
     align: 'right',
@@ -44,7 +44,7 @@ const columns: GridColDef<DailyStatistic>[] = [
   },
   {
     field: 'averageConsumption',
-    headerName: 'Consumption average',
+    headerName: 'Consumption average (MWh)',
     minWidth: 215,
     flex: 1,
     align: 'right',
@@ -54,7 +54,7 @@ const columns: GridColDef<DailyStatistic>[] = [
   },
   {
     field: 'averagePrice',
-    headerName: 'Price average',
+    headerName: 'Price average (c/kWh)',
     minWidth: 170,
     flex: 0.8,
     align: 'right',

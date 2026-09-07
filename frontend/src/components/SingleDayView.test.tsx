@@ -9,20 +9,20 @@ afterEach(cleanup)
 const detail = {
   date: '2024-09-01',
   totalProduction: 718585,
-  totalConsumption: 96803463.9,
+  totalConsumption: 96803,
   averagePrice: 1.044,
   peakConsumptionRatioHour: {
     startTime: '2024-09-01T10:00:00',
     production: 27854.8,
-    consumption: 4214990.713,
+    consumption: 4214.990713,
     price: 0.4,
-    consumptionProductionRatio: 151.32,
+    consumptionProductionRatio: 0.151,
   },
   cheapestHours: [
     {
       startTime: '2024-09-01T00:00:00',
       production: 30687.35,
-      consumption: 3456794.951,
+      consumption: 3456.794951,
       price: 0,
     },
   ],
@@ -45,11 +45,11 @@ describe('SingleDayView', () => {
     expect(screen.getByText('01 September 2024')).toBeInTheDocument()
     expect(
       screen.getByText(
-        (content) => content.replace(/\s/g, '') === '96803463,9',
+        (content) => content.replace(/\s/g, '') === '96803',
       ),
     ).toBeInTheDocument()
-    expect(screen.getByText('151,320x at 10:00')).toBeInTheDocument()
-    expect(screen.getByText(/0,000/)).toBeInTheDocument()
+    expect(screen.getByText('0,151x at 10:00')).toBeInTheDocument()
+    expect(screen.getByText('Price 0,000 c/kWh')).toBeInTheDocument()
   })
 
   it('reports unavailable data and invokes navigation', async () => {

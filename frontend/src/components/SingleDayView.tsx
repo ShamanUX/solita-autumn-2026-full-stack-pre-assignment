@@ -12,14 +12,14 @@ import {
 
 import type { DailyStatisticDetail } from '../data/dailyStatisticDetail.js'
 
-const numberFormatter = new Intl.NumberFormat('en-FI', {
-  maximumFractionDigits: 1,
+const numberFormatter = new Intl.NumberFormat('fi-FI', {
+  maximumFractionDigits: 0,
 })
-const priceFormatter = new Intl.NumberFormat('en-FI', {
+const priceFormatter = new Intl.NumberFormat('fi-FI', {
   minimumFractionDigits: 3,
   maximumFractionDigits: 3,
 })
-const ratioFormatter = new Intl.NumberFormat('en-FI', {
+const ratioFormatter = new Intl.NumberFormat('fi-FI', {
   minimumFractionDigits: 3,
   maximumFractionDigits: 3,
 })
@@ -126,9 +126,12 @@ export function SingleDayView({
             }}
           >
             {[
-              ['Total consumption', formatValue(detail.totalConsumption)],
-              ['Total production', formatValue(detail.totalProduction)],
-              ['Average price', formatPrice(detail.averagePrice)],
+              [
+                'Total consumption (MWh)',
+                formatValue(detail.totalConsumption),
+              ],
+              ['Total production (MWh)', formatValue(detail.totalProduction)],
+              ['Average price (c/kWh)', formatPrice(detail.averagePrice)],
               [
                 'Highest consumption / production',
                 detail.peakConsumptionRatioHour === null
@@ -210,7 +213,7 @@ export function SingleDayView({
                       {formatTime(hour.startTime)}
                     </Typography>
                     <Typography color="text.secondary" variant="body2">
-                      Price {formatPrice(hour.price)}
+                      Price {formatPrice(hour.price)} c/kWh
                     </Typography>
                   </Stack>
                 </Box>
