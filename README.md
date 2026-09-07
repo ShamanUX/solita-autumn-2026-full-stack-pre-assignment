@@ -10,7 +10,10 @@ technical plan is available in [docs/architecture-planning.md](docs/architecture
 
 ## Running the backend locally
 
-Docker Desktop and Node.js 22 or newer are required. Start PostgreSQL, the
+The backend and database are hosted on Vercel at
+<https://solita-electricity-backend.vercel.app/>.
+
+Docker Desktop is required to run the backend locally. Start PostgreSQL, the
 Feathers API, and Adminer with:
 
 ```sh
@@ -18,23 +21,9 @@ docker compose up --build --renew-anon-volumes -d
 ```
 
 The API health check is available at <http://localhost:3030/health> and Adminer
-at <http://localhost:8088/>. For host development and tests, install packages
-and use the supplied database:
+at <http://localhost:8088/>.
 
-```sh
-npm install
-docker compose up -d db
-npm test
-npm run dev
-```
-
-The default host database URL is
-`postgresql://academy:academy@localhost:15432/electricity`. PostgreSQL still
-uses port `5432` inside Docker. `POSTGRES_PORT` can override the exposed port;
-set the same port in `DATABASE_URL` when running the backend directly on the
-host.
-
-### Daily statistics API
+## Daily statistics API
 
 `GET /daily-statistics` returns daily production and consumption totals and the
 average price calculated from the available hourly values. The response contains a
@@ -69,30 +58,56 @@ npm install
 npm run dev:frontend
 ```
 
+By default, the local db and backend are used. In the `frontend/` folder's `.env` file, add
+
+`BACKEND_URL=https://solita-electricity-backend.vercel.app/`
+
+to use the cloud hosted backend instead.
+
 Open <http://localhost:5173/>. The graph month picker defaults to September
 2024, while the table has an independent optional date range. Select
-a table row action or a plotted graph day to open its single-day details. Run
-the frontend production build and tests with:
+a table row action or a plotted graph day to open its single-day details.
+
+## Testing and building
+
+The root commands run checks for both the backend and frontend workspaces. The
+backend integration tests require the supplied PostgreSQL database. If the full
+Docker Compose stack is not already running, start only the database first:
 
 ```sh
-npm run build --workspace frontend
-npm run test --workspace frontend
+docker compose up -d db
+npm test
+npm run build
 ```
+
+When the full stack is already running, PostgreSQL is available and the
+database-only Compose command is not needed. Node.js 22 or newer and the
+dependencies installed above are required to run these checks.
+
+## Next steps
+
+- Install and configure ESLint for the backend TypeScript and frontend React
+  code.
+- Install Prettier and add formatting scripts for the existing configuration.
+- Configure Husky and lint-staged to run fast linting and formatting checks
+  before commits.
+- Add GitHub Actions to run linting, builds, and tests, including PostgreSQL for
+  the backend integration tests.
+- Configure Dependabot or Renovate for automated dependency updates.
+- Add E2E tests.
+
+Full builds and test suites should run in CI rather than in pre-commit hooks so
+that local commits remain fast.
 
 ## Use of Generative AI
 
 Generative AI is used as a development assistant.
 
-Each development choice is originally decided by me or an AI suggestion that was carefully reviewed.
+Each development choice is originally decided by me or is an AI suggestion that was carefully reviewed.
 
-So far, AI has been used to:
+AI has been used to:
 
-- inspect the provided Docker and database configuration;
-- help plan the architecture;
-- run installation for agreed upon architecture
-- AI suggested Fastify for backend framework. I looked up alternatives and chose Feathers.js, seemed solid and it's nice to try new tech in tasks like this.
-- Plan folder structure -> kept Docker files in root, add frontend/ and backend/ folders, with tsconfig file for each.
-- I direct AI to write sufficiently concise changes as separate PRs.
-- implement and test the single-day electricity statistics drill-down.
-- normalize electricity units and apply Finnish number formatting.
-- Correct the daily overview aggregation from hourly averages to daily totals.
+- Run installation for agreed upon architecture
+- Plan folder structure
+- Help create in-depth specifications for features and tests, and run the implementation to create PRs that are comfortably sized to be reviewed by a human.
+- Update docs with up-to-date information.
