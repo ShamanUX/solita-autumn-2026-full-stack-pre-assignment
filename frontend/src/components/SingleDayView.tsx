@@ -177,13 +177,6 @@ export function SingleDayView({
             <Box
               component="ol"
               sx={{
-                display: 'grid',
-                gridTemplateColumns: {
-                  xs: '1fr',
-                  sm: 'repeat(2, minmax(0, 1fr))',
-                  lg: 'repeat(5, minmax(0, 1fr))',
-                },
-                gap: 1,
                 listStyle: 'none',
                 m: 0,
                 mt: 2,
@@ -195,23 +188,31 @@ export function SingleDayView({
                   component="li"
                   key={hour.startTime}
                   sx={{
-                    borderTop: 3,
-                    borderColor: 'primary.main',
-                    p: 2,
-                    bgcolor: '#171818',
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    py: 1.5,
+                    '&:last-child': { borderBottom: 0 },
                   }}
                 >
-                  <Typography color="primary.main" variant="body2">
-                    #{index + 1}
-                  </Typography>
-                  <Typography
-                    sx={{ fontSize: '1.6rem', fontWeight: 600, mt: 1 }}
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ alignItems: 'center' }}
                   >
-                    {formatTime(hour.startTime)}
-                  </Typography>
-                  <Typography color="text.secondary" variant="body2">
-                    Price {formatPrice(hour.price)}
-                  </Typography>
+                    <Typography
+                      color="primary.main"
+                      variant="body2"
+                      sx={{ width: 24 }}
+                    >
+                      {index + 1}.
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, minWidth: 52 }}>
+                      {formatTime(hour.startTime)}
+                    </Typography>
+                    <Typography color="text.secondary" variant="body2">
+                      Price {formatPrice(hour.price)}
+                    </Typography>
+                  </Stack>
                 </Box>
               ))}
             </Box>

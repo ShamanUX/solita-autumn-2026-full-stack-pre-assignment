@@ -24,8 +24,7 @@ function getMonthEnd(month: string) {
 }
 
 export function DailyStatisticsContainer() {
-  const [month, setMonth] = useState('')
-  const [latestMonth, setLatestMonth] = useState('')
+  const [month, setMonth] = useState('2024-09')
   const [rows, setRows] = useState<DailyStatistic[]>([])
   const [rowCount, setRowCount] = useState(0)
   const [pagination, setPagination] = useState<GridPaginationModel>({
@@ -70,39 +69,18 @@ export function DailyStatisticsContainer() {
             sortField: (selectedSort?.field ?? 'date') as StatisticSortField,
             sortDirection: selectedSort?.sort ?? ('desc' as const),
           }
-        : month
-          ? {
-              from: `${month}-01`,
-              to: getMonthEnd(month),
-              page: 0,
-              pageSize: 31,
-              sortField: 'date' as StatisticSortField,
-              sortDirection: 'asc' as const,
-            }
-          : {
-              from: '',
-              to: '',
-              page: 0,
-              pageSize: 1,
-              sortField: 'date' as StatisticSortField,
-              sortDirection: 'desc' as const,
-            }
+        : {
+            from: `${month}-01`,
+            to: getMonthEnd(month),
+            page: 0,
+            pageSize: 31,
+            sortField: 'date' as StatisticSortField,
+            sortDirection: 'asc' as const,
+          }
 
     void getDailyStatistics(query)
       .then((result) => {
         if (!current) return
-
-        if (display === 'graph' && !month) {
-          const latestDate = result.data[0]?.date
-          if (latestDate) {
-            const availableMonth = latestDate.slice(0, 7)
-            setLatestMonth(availableMonth)
-            setMonth(availableMonth)
-          } else {
-            setRows([])
-          }
-          return
-        }
 
         setRows(result.data)
         setRowCount(result.total)
@@ -155,7 +133,7 @@ export function DailyStatisticsContainer() {
   return (
     <DailyStatisticsView
       month={month}
-      latestMonth={latestMonth}
+      latestMonth=""
       rows={rows}
       rowCount={rowCount}
       pagination={pagination}

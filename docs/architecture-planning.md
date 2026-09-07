@@ -40,10 +40,9 @@ The React frontend will feature no routing for this usecase. We follow the Conta
 
 `DailyStatisticsContainer` owns API, graph month, table date range, pagination,
 sorting, and display-mode state. The table requests server-paginated sets of 10
-daily averages with its independently applied optional date range. When the
-graph is opened, it requests the latest available date and uses its month as the
-default. Each selected month is then loaded in one bounded API request
-containing at most 31 daily averages.
+daily averages with its independently applied optional date range. The graph
+defaults to September 2024, and each selected month is loaded in one bounded API
+request containing at most 31 daily averages.
 `DailyStatisticsView` composes controlled presentational components.
 
 `DailyStatisticsDisplay` provides the table/graph switch and shared loading and

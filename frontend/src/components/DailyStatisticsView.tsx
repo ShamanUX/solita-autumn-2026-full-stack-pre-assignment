@@ -169,39 +169,57 @@ export function DailyStatisticsView({
             minHeight: { md: 0 },
           }}
         >
-          {selectedDate === null ? (
-            <DailyStatisticsDisplay
-              display={display}
-              month={month}
-              latestMonth={latestMonth}
-              rows={rows}
-              rowCount={rowCount}
-              pagination={pagination}
-              sortModel={sortModel}
-              loading={loading}
-              error={error}
-              dateRange={dateRange}
-              invalidDateRange={invalidDateRange}
-              onPaginationChange={onPaginationChange}
-              onSortChange={onSortChange}
-              onRetry={onRetry}
-              onDisplayChange={onDisplayChange}
-              onMonthChange={onMonthChange}
-              onDateRangeChange={onDateRangeChange}
-              onDateRangeApply={onDateRangeApply}
-              onDateRangeClear={onDateRangeClear}
-              onDaySelect={onDaySelect}
-            />
-          ) : (
-            <SingleDayView
-              date={selectedDate}
-              detail={detail}
-              loading={detailLoading}
-              error={detailError}
-              onBack={onDetailBack}
-              onRetry={onDetailRetry}
-            />
-          )}
+          <Box
+            key={selectedDate ?? display}
+            sx={{
+              display: 'flex',
+              flex: 1,
+              flexDirection: 'column',
+              minHeight: 0,
+              animation: 'viewEnter 240ms ease-out',
+              '@keyframes viewEnter': {
+                from: { opacity: 0, transform: 'translateY(6px)' },
+                to: { opacity: 1, transform: 'translateY(0)' },
+              },
+              '@media (prefers-reduced-motion: reduce)': {
+                animation: 'none',
+              },
+            }}
+          >
+            {selectedDate === null ? (
+              <DailyStatisticsDisplay
+                display={display}
+                month={month}
+                latestMonth={latestMonth}
+                rows={rows}
+                rowCount={rowCount}
+                pagination={pagination}
+                sortModel={sortModel}
+                loading={loading}
+                error={error}
+                dateRange={dateRange}
+                invalidDateRange={invalidDateRange}
+                onPaginationChange={onPaginationChange}
+                onSortChange={onSortChange}
+                onRetry={onRetry}
+                onDisplayChange={onDisplayChange}
+                onMonthChange={onMonthChange}
+                onDateRangeChange={onDateRangeChange}
+                onDateRangeApply={onDateRangeApply}
+                onDateRangeClear={onDateRangeClear}
+                onDaySelect={onDaySelect}
+              />
+            ) : (
+              <SingleDayView
+                date={selectedDate}
+                detail={detail}
+                loading={detailLoading}
+                error={detailError}
+                onBack={onDetailBack}
+                onRetry={onDetailRetry}
+              />
+            )}
+          </Box>
         </Paper>
       </Container>
     </Box>

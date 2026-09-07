@@ -66,8 +66,8 @@ npm install
 npm run dev:frontend
 ```
 
-Open <http://localhost:5173/>. The graph month picker defaults to the latest
-available month, while the table has an independent optional date range. Select
+Open <http://localhost:5173/>. The graph month picker defaults to September
+2024, while the table has an independent optional date range. Select
 a table row action or a plotted graph day to open its single-day details. Run
 the frontend production build and tests with:
 

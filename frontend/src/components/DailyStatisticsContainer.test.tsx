@@ -161,7 +161,7 @@ describe('DailyStatisticsContainer', () => {
     expect(screen.queryByLabelText('From')).not.toBeInTheDocument()
   })
 
-  it('discovers and loads the latest available month for the graph', async () => {
+  it('loads September 2024 as the default graph month', async () => {
     const user = userEvent.setup()
     render(<DailyStatisticsContainer />)
     await screen.findByText('1 days found')
@@ -172,14 +172,6 @@ describe('DailyStatisticsContainer', () => {
       await screen.findByRole('button', { name: 'Month 2024-09' }),
     ).toBeInTheDocument()
     expect(mockedGetDailyStatistics).toHaveBeenNthCalledWith(2, {
-      from: '',
-      to: '',
-      page: 0,
-      pageSize: 1,
-      sortField: 'date',
-      sortDirection: 'desc',
-    })
-    expect(mockedGetDailyStatistics).toHaveBeenLastCalledWith({
       from: '2024-09-01',
       to: '2024-09-30',
       page: 0,
