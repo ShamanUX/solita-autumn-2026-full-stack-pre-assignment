@@ -1,5 +1,5 @@
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import {
   DataGrid,
   type GridColDef,
@@ -72,6 +72,7 @@ interface DailyStatisticsGridProps {
   loading: boolean
   onPaginationChange: (pagination: GridPaginationModel) => void
   onSortChange: (sortModel: GridSortModel) => void
+  onDaySelect: (date: string) => void
 }
 
 function EmptyResults() {
@@ -106,7 +107,25 @@ export function DailyStatisticsGrid({
   loading,
   onPaginationChange,
   onSortChange,
+  onDaySelect,
 }: DailyStatisticsGridProps) {
+  const selectableColumns: GridColDef<DailyStatistic>[] = [
+    ...columns,
+    {
+      field: 'viewDay',
+      headerName: '',
+      sortable: false,
+      filterable: false,
+      width: 120,
+      align: 'right',
+      renderCell: ({ row }) => (
+        <Button size="small" onClick={() => onDaySelect(row.date)}>
+          View day
+        </Button>
+      ),
+    },
+  ]
+
   return (
     <Box
       sx={{
@@ -118,7 +137,7 @@ export function DailyStatisticsGrid({
       <DataGrid
         rows={rows}
         rowCount={rowCount}
-        columns={columns}
+        columns={selectableColumns}
         getRowId={(row) => row.date}
         loading={loading}
         paginationModel={pagination}

@@ -1,4 +1,8 @@
-import { Box, Button, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
+import dayjs from 'dayjs'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 
 export interface DateRange {
   from: string
@@ -29,60 +33,73 @@ export function DateRangeFilter({
       }}
       sx={{
         p: { xs: 2.5, md: 2 },
-        '& input[type="date"]': { colorScheme: 'dark' },
       }}
     >
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={2}
-        sx={{ alignItems: { md: 'flex-start' } }}
-      >
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h2" sx={{ fontSize: '1.25rem', mb: 0.5 }}>
-            Search by date
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Both dates are optional and included in the results.
-          </Typography>
-        </Box>
-        <TextField
-          label="From"
-          type="date"
-          value={dateRange.from}
-          onChange={(event) =>
-            onChange({ ...dateRange, from: event.target.value })
-          }
-          error={invalid}
-          slotProps={{
-            inputLabel: { shrink: true },
-            htmlInput: { max: dateRange.to || undefined },
-          }}
-          sx={{ width: { md: 190 } }}
-        />
-        <TextField
-          label="To"
-          type="date"
-          value={dateRange.to}
-          onChange={(event) =>
-            onChange({ ...dateRange, to: event.target.value })
-          }
-          error={invalid}
-          helperText={invalid ? 'To date must follow from date' : ' '}
-          slotProps={{
-            inputLabel: { shrink: true },
-            htmlInput: { min: dateRange.from || undefined },
-          }}
-          sx={{ width: { md: 190 } }}
-        />
-        <Stack direction="row" spacing={1}>
-          <Button type="submit" variant="contained" disabled={invalid}>
-            Apply dates
-          </Button>
-          <Button type="button" color="inherit" onClick={onClear}>
-            Clear
-          </Button>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          sx={{ alignItems: { md: 'flex-start' } }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h2" sx={{ fontSize: '1.25rem', mb: 0.5 }}>
+              Search by date
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Both dates are optional and included in the results.
+            </Typography>
+          </Box>
+          <DatePicker
+            label="From"
+            value={dateRange.from ? dayjs(dateRange.from) : null}
+            {...(dateRange.to ? { maxDate: dayjs(dateRange.to) } : {})}
+            onChange={(value) =>
+              onChange({
+                ...dateRange,
+                from: value?.isValid() ? value.format('YYYY-MM-DD') : '',
+              })
+            }
+            slotProps={{
+              textField: {
+                error: invalid,
+                sx: {
+                  width: { md: 190 },
+                  '& .MuiPickersInputBase-root': { height: 44 },
+                },
+              },
+            }}
+          />
+          <DatePicker
+            label="To"
+            value={dateRange.to ? dayjs(dateRange.to) : null}
+            {...(dateRange.from ? { minDate: dayjs(dateRange.from) } : {})}
+            onChange={(value) =>
+              onChange({
+                ...dateRange,
+                to: value?.isValid() ? value.format('YYYY-MM-DD') : '',
+              })
+            }
+            slotProps={{
+              textField: {
+                error: invalid,
+                helperText: invalid ? 'To date must follow from date' : ' ',
+                sx: {
+                  width: { md: 190 },
+                  '& .MuiPickersInputBase-root': { height: 44 },
+                },
+              },
+            }}
+          />
+          <Stack direction="row" spacing={1}>
+            <Button type="submit" variant="contained" disabled={invalid}>
+              Apply dates
+            </Button>
+            <Button type="button" color="inherit" onClick={onClear}>
+              Clear
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
+      </LocalizationProvider>
     </Box>
   )
 }

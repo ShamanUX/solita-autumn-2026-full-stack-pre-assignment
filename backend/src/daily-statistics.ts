@@ -1,5 +1,5 @@
-import { BadRequest } from '@feathersjs/errors'
-import type { Params } from '@feathersjs/feathers'
+import { BadRequest, NotFound } from '@feathersjs/errors'
+import type { Id, Params } from '@feathersjs/feathers'
 import type { Knex } from 'knex'
 
 export interface DailyStatistic {
@@ -12,6 +12,27 @@ export interface DailyStatistic {
 export interface DailyStatisticsPage {
   data: DailyStatistic[]
   total: number
+}
+
+export interface HourlyStatistic {
+  startTime: string
+  production: number | null
+  consumption: number | null
+  price: number | null
+}
+
+export interface PeakConsumptionRatioHour extends HourlyStatistic {
+  consumptionProductionRatio: number
+}
+
+export interface DailyStatisticDetail {
+  date: string
+  totalProduction: number | null
+  totalConsumption: number | null
+  averagePrice: number | null
+  peakConsumptionRatioHour: PeakConsumptionRatioHour | null
+  cheapestHours: HourlyStatistic[]
+  hours: HourlyStatistic[]
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -35,6 +56,13 @@ interface DatabaseDailyStatistic {
 
 interface DatabaseCount {
   total: string
+}
+
+interface DatabaseHourlyStatistic {
+  startTime: string
+  production: string | null
+  consumption: string | null
+  price: string | null
 }
 
 const sortColumns: Record<SortField, string> = {
@@ -131,8 +159,120 @@ function toNumber(value: string | null): number | null {
   return value === null ? null : Number(value)
 }
 
+function round(value: number, fractionDigits: number): number {
+  const multiplier = 10 ** fractionDigits
+  return Math.round((value + Number.EPSILON) * multiplier) / multiplier
+}
+
+function sum(values: Array<number | null>, fractionDigits: number) {
+  const availableValues = values.filter(
+    (value): value is number => value !== null,
+  )
+  return availableValues.length === 0
+    ? null
+    : round(
+        availableValues.reduce((total, value) => total + value, 0),
+        fractionDigits,
+      )
+}
+
+function average(values: Array<number | null>, fractionDigits: number) {
+  const availableValues = values.filter(
+    (value): value is number => value !== null,
+  )
+  return availableValues.length === 0
+    ? null
+    : round(
+        availableValues.reduce((total, value) => total + value, 0) /
+          availableValues.length,
+        fractionDigits,
+      )
+}
+
 export class DailyStatisticsService {
   constructor(private readonly database: Knex) {}
+
+  async get(id: Id): Promise<DailyStatisticDetail> {
+    const date = parseDate(id, 'date')
+    if (date === undefined) throw new BadRequest('date is required')
+
+    console.debug('Fetching daily statistic detail from database', { date })
+    const rows = (await this.database('electricitydata')
+      .select({
+        startTime: this.database.raw(`TO_CHAR(??, 'YYYY-MM-DD"T"HH24:MI:SS')`, [
+          'starttime',
+        ]),
+        production: 'productionamount',
+        consumption: 'consumptionamount',
+        price: 'hourlyprice',
+      })
+      .where('date', date)
+      .whereNotNull('starttime')
+      .orderBy('starttime', 'asc')) as DatabaseHourlyStatistic[]
+
+    if (rows.length === 0) {
+      throw new NotFound(`No electricity statistics found for ${date}`)
+    }
+
+    const hours = rows.map((row) => ({
+      startTime: row.startTime,
+      production: toNumber(row.production),
+      consumption: toNumber(row.consumption),
+      price: toNumber(row.price),
+    }))
+    const peakConsumptionRatioHour =
+      hours.reduce<PeakConsumptionRatioHour | null>((peak, hour) => {
+        if (
+          hour.consumption === null ||
+          hour.production === null ||
+          hour.production === 0
+        ) {
+          return peak
+        }
+
+        const candidate = {
+          ...hour,
+          consumptionProductionRatio: round(
+            hour.consumption / hour.production,
+            3,
+          ),
+        }
+        return peak === null ||
+          candidate.consumptionProductionRatio > peak.consumptionProductionRatio
+          ? candidate
+          : peak
+      }, null)
+    const cheapestHours = hours
+      .filter(
+        (hour): hour is HourlyStatistic & { price: number } =>
+          hour.price !== null,
+      )
+      .sort(
+        (first, second) =>
+          first.price - second.price ||
+          first.startTime.localeCompare(second.startTime),
+      )
+      .slice(0, 5)
+
+    return {
+      date,
+      totalProduction: sum(
+        hours.map((hour) => hour.production),
+        1,
+      ),
+      totalConsumption: sum(
+        hours.map((hour) => hour.consumption),
+        1,
+      ),
+      averagePrice: average(
+        hours.map((hour) => hour.price),
+        3,
+      ),
+      peakConsumptionRatioHour,
+      cheapestHours,
+      hours,
+    }
+  }
 
   async find(
     params?: Params<Record<string, unknown>>,

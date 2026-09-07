@@ -51,7 +51,7 @@ export function createApp(databaseUrl = process.env.DATABASE_URL ?? defaultDatab
   app.use(
     'daily-statistics',
     new DailyStatisticsService(postgresqlClient),
-    { methods: ['find'] },
+    { methods: ['find', 'get'] },
   )
   app.use('health', new HealthService(postgresqlClient), {
     methods: ['find']

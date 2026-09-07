@@ -11,11 +11,9 @@ vi.mock('./DailyStatisticsChart.js', () => ({
 }))
 
 vi.mock('./MonthSelector.js', () => ({
-  MonthSelector: ({
-    onChange,
-  }: {
-    onChange: (month: string) => void
-  }) => <button onClick={() => onChange('2024-08')}>August 2024</button>,
+  MonthSelector: ({ onChange }: { onChange: (month: string) => void }) => (
+    <button onClick={() => onChange('2024-08')}>August 2024</button>
+  ),
 }))
 
 afterEach(cleanup)
@@ -40,6 +38,7 @@ const defaultProps = {
   onPaginationChange: vi.fn(),
   onSortChange: vi.fn(),
   onRetry: vi.fn(),
+  onDaySelect: vi.fn(),
 }
 
 describe('DailyStatisticsDisplay', () => {
@@ -55,7 +54,7 @@ describe('DailyStatisticsDisplay', () => {
 
     await user.click(screen.getByRole('button', { name: 'Graph' }))
     expect(onDisplayChange).toHaveBeenCalledWith('graph')
-    expect(screen.getByLabelText('From')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'From' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'August 2024' }),
     ).not.toBeInTheDocument()
@@ -72,7 +71,9 @@ describe('DailyStatisticsDisplay', () => {
         name: 'Daily electricity statistics graph',
       }),
     ).toBeInTheDocument()
-    expect(screen.queryByLabelText('From')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('group', { name: 'From' }),
+    ).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'August 2024' }))
     expect(defaultProps.onMonthChange).toHaveBeenCalledWith('2024-08')
@@ -91,11 +92,7 @@ describe('DailyStatisticsDisplay', () => {
     expect(screen.getByText('Loading records...')).toBeInTheDocument()
 
     rerender(
-      <DailyStatisticsDisplay
-        {...defaultProps}
-        error
-        onRetry={onRetry}
-      />,
+      <DailyStatisticsDisplay {...defaultProps} error onRetry={onRetry} />,
     )
     expect(screen.getByText('0 days found')).toBeInTheDocument()
     expect(

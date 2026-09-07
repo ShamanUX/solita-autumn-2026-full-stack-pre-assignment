@@ -1,6 +1,6 @@
 # Architecture and Installation Plan
 
-Status: daily statistics API and API-backed frontend implemented
+Status: daily statistics overview and single-day drill-down implemented
 
 ## Goals
 
@@ -28,23 +28,36 @@ price observations. Its REST endpoint provides inclusive date filtering,
 server-side pagination, and allowlisted single-column ordering. Missing
 measurements remain `null` rather than being treated as zero.
 
+The same service exposes `GET /daily-statistics/:date` for a single-day detail.
+It returns ordered hourly observations, production and consumption sums, the
+average price, the hour with the greatest consumption-to-production ratio, and
+the five lowest-priced hours. Ratio candidates require consumption and non-zero
+production. Equal prices retain chronological ordering.
+
 ## Frontend architecture
 
 The React frontend will feature no routing for this usecase. We follow the Container and Presentational Component pattern, separating logic and visual components.
 
 `DailyStatisticsContainer` owns API, graph month, table date range, pagination,
 sorting, and display-mode state. The table requests server-paginated sets of 10
-daily averages with its independently applied optional date range. When the
-graph is opened, it requests the latest available date and uses its month as the
-default. Each selected month is then loaded in one bounded API request
-containing at most 31 daily averages.
+daily averages with its independently applied optional date range. The graph
+defaults to September 2024, and each selected month is loaded in one bounded API
+request containing at most 31 daily averages. Table and graph results have
+independent state and are retained across display changes, so switching modes
+does not repeat an unchanged query.
 `DailyStatisticsView` composes controlled presentational components.
 
-`DailyStatisticsDisplay` provides the table/graph switch and shared loading and
-error states. Its MUI month picker is shown only for the graph, and its date
-range filter is shown only for the table. The table uses server-side pagination
-and sorting, while the graph keeps electricity values and price on separate
-axes because they use different scales.
+`DailyStatisticsDisplay` provides the table/graph switch and renders the active
+mode's loading and error state. Its MUI month picker is shown only for the graph,
+and its MUI date pickers are shown only for the table's date range filter. The
+table uses server-side pagination and sorting, while the graph keeps electricity
+values and price on separate axes because they use different scales.
+
+Selecting a table action or a plotted graph day opens `SingleDayView` in the
+same content panel. The container loads the selected date independently and
+retains the overview's display mode, month, date range, page, and sorting so the
+Back action restores the previous context without refetching it. No router is
+needed for this in-place drill-down.
 
 On desktop, the page uses the available `100vh` with a `900px` minimum height.
 This keeps the controls and active data view in one viewport at normal desktop

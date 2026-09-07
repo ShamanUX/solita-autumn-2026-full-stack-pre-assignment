@@ -49,6 +49,12 @@ and `averagePrice`. For example:
 http://localhost:3030/daily-statistics?from=2024-09-01&to=2024-09-30&page=0&pageSize=10&sortField=date&sortDirection=desc
 ```
 
+`GET /daily-statistics/:date` returns details for one date. The response
+contains hourly observations, daily production and consumption totals, average
+price, the hour with the highest consumption-to-production ratio, and the five
+cheapest hours. Missing measurements remain `null`; rows without both
+consumption and non-zero production are excluded from the ratio comparison.
+
 ## Running the frontend
 
 The React frontend loads daily statistics from the backend through the Vite
@@ -60,9 +66,10 @@ npm install
 npm run dev:frontend
 ```
 
-Open <http://localhost:5173/>. The month picker defaults to the latest available
-month and loads its daily averages for the graph and table. Run the frontend
-production build and tests with:
+Open <http://localhost:5173/>. The graph month picker defaults to September
+2024, while the table has an independent optional date range. Select
+a table row action or a plotted graph day to open its single-day details. Run
+the frontend production build and tests with:
 
 ```sh
 npm run build --workspace frontend
@@ -83,3 +90,4 @@ So far, AI has been used to:
 - AI suggested Fastify for backend framework. I looked up alternatives and chose Feathers.js, seemed solid and it's nice to try new tech in tasks like this.
 - Plan folder structure -> kept Docker files in root, add frontend/ and backend/ folders, with tsconfig file for each.
 - I direct AI to write sufficiently concise changes as separate PRs.
+- implement and test the single-day electricity statistics drill-down.

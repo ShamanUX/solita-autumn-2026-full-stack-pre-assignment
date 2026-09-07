@@ -3,11 +3,13 @@ import { Box, Container, Divider, Paper, Stack, Typography } from '@mui/material
 import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid'
 
 import type { DailyStatistic } from '../data/dailyStatistics.js'
+import type { DailyStatisticDetail } from '../data/dailyStatisticDetail.js'
 import {
   DailyStatisticsDisplay,
   type StatisticsDisplay,
 } from './DailyStatisticsDisplay.js'
 import type { DateRange } from './DateRangeFilter.js'
+import { SingleDayView } from './SingleDayView.js'
 
 interface DailyStatisticsViewProps {
   month: string
@@ -21,6 +23,10 @@ interface DailyStatisticsViewProps {
   display: StatisticsDisplay
   dateRange: DateRange
   invalidDateRange: boolean
+  selectedDate: string | null
+  detail: DailyStatisticDetail | null
+  detailLoading: boolean
+  detailError: boolean
   onMonthChange: (month: string) => void
   onDateRangeChange: (dateRange: DateRange) => void
   onDateRangeApply: () => void
@@ -29,6 +35,9 @@ interface DailyStatisticsViewProps {
   onSortChange: (sortModel: GridSortModel) => void
   onRetry: () => void
   onDisplayChange: (display: StatisticsDisplay) => void
+  onDaySelect: (date: string) => void
+  onDetailBack: () => void
+  onDetailRetry: () => void
 }
 
 export function DailyStatisticsView({
@@ -43,6 +52,10 @@ export function DailyStatisticsView({
   display,
   dateRange,
   invalidDateRange,
+  selectedDate,
+  detail,
+  detailLoading,
+  detailError,
   onMonthChange,
   onDateRangeChange,
   onDateRangeApply,
@@ -51,6 +64,9 @@ export function DailyStatisticsView({
   onSortChange,
   onRetry,
   onDisplayChange,
+  onDaySelect,
+  onDetailBack,
+  onDetailRetry,
 }: DailyStatisticsViewProps) {
   return (
     <Box
@@ -153,27 +169,57 @@ export function DailyStatisticsView({
             minHeight: { md: 0 },
           }}
         >
-          <DailyStatisticsDisplay
-            display={display}
-            month={month}
-            latestMonth={latestMonth}
-            rows={rows}
-            rowCount={rowCount}
-            pagination={pagination}
-            sortModel={sortModel}
-            loading={loading}
-            error={error}
-            dateRange={dateRange}
-            invalidDateRange={invalidDateRange}
-            onPaginationChange={onPaginationChange}
-            onSortChange={onSortChange}
-            onRetry={onRetry}
-            onDisplayChange={onDisplayChange}
-            onMonthChange={onMonthChange}
-            onDateRangeChange={onDateRangeChange}
-            onDateRangeApply={onDateRangeApply}
-            onDateRangeClear={onDateRangeClear}
-          />
+          <Box
+            key={selectedDate ?? display}
+            sx={{
+              display: 'flex',
+              flex: 1,
+              flexDirection: 'column',
+              minHeight: 0,
+              animation: 'viewEnter 240ms ease-out',
+              '@keyframes viewEnter': {
+                from: { opacity: 0, transform: 'translateY(6px)' },
+                to: { opacity: 1, transform: 'translateY(0)' },
+              },
+              '@media (prefers-reduced-motion: reduce)': {
+                animation: 'none',
+              },
+            }}
+          >
+            {selectedDate === null ? (
+              <DailyStatisticsDisplay
+                display={display}
+                month={month}
+                latestMonth={latestMonth}
+                rows={rows}
+                rowCount={rowCount}
+                pagination={pagination}
+                sortModel={sortModel}
+                loading={loading}
+                error={error}
+                dateRange={dateRange}
+                invalidDateRange={invalidDateRange}
+                onPaginationChange={onPaginationChange}
+                onSortChange={onSortChange}
+                onRetry={onRetry}
+                onDisplayChange={onDisplayChange}
+                onMonthChange={onMonthChange}
+                onDateRangeChange={onDateRangeChange}
+                onDateRangeApply={onDateRangeApply}
+                onDateRangeClear={onDateRangeClear}
+                onDaySelect={onDaySelect}
+              />
+            ) : (
+              <SingleDayView
+                date={selectedDate}
+                detail={detail}
+                loading={detailLoading}
+                error={detailError}
+                onBack={onDetailBack}
+                onRetry={onDetailRetry}
+              />
+            )}
+          </Box>
         </Paper>
       </Container>
     </Box>
