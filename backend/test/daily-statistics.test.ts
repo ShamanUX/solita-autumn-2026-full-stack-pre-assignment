@@ -56,6 +56,55 @@ describe('daily statistics service', () => {
     })
   })
 
+  it('returns totals and hourly insights for one day', async () => {
+    const result = await app.service('daily-statistics').get('2024-09-01')
+
+    expect(result).toMatchObject({
+      date: '2024-09-01',
+      totalProduction: 718585,
+      totalConsumption: 96803463.9,
+      averagePrice: 1.044,
+      peakConsumptionRatioHour: {
+        startTime: '2024-09-01T10:00:00',
+        consumptionProductionRatio: 151.32,
+      },
+    })
+    expect(result.hours).toHaveLength(24)
+    expect(result.hours[0]).toEqual({
+      startTime: '2024-09-01T00:00:00',
+      production: 30687.35,
+      consumption: 3456794.951,
+      price: 0,
+    })
+    expect(result.cheapestHours).toHaveLength(5)
+    expect(result.cheapestHours.map(({ startTime }) => startTime)).toEqual([
+      '2024-09-01T00:00:00',
+      '2024-09-01T03:00:00',
+      '2024-09-01T04:00:00',
+      '2024-09-01T05:00:00',
+      '2024-09-01T06:00:00',
+    ])
+  })
+
+  it('keeps unavailable single-day measurements null', async () => {
+    const result = await app.service('daily-statistics').get('2024-10-01')
+
+    expect(result.totalConsumption).toBeNull()
+    expect(result.peakConsumptionRatioHour).toBeNull()
+    expect(result.hours.every(({ consumption }) => consumption === null)).toBe(
+      true,
+    )
+  })
+
+  it('rejects invalid and unavailable single-day dates', async () => {
+    await expect(
+      app.service('daily-statistics').get('2024-02-30'),
+    ).rejects.toMatchObject({ code: 400 })
+    await expect(
+      app.service('daily-statistics').get('2030-01-01'),
+    ).rejects.toMatchObject({ code: 404 })
+  })
+
   it('applies page offsets and stable metric sorting with nulls last', async () => {
     const paginated = await app.service('daily-statistics').find({
       query: { page: 1, pageSize: 2 },
@@ -118,6 +167,16 @@ describe('daily statistics service', () => {
     await expect(invalidResponse.json()).resolves.toMatchObject({
       code: 400,
       name: 'BadRequest',
+    })
+  })
+
+  it('exposes a single-day detail through REST', async () => {
+    const response = await fetch(`${baseUrl}/daily-statistics/2024-09-01`)
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toMatchObject({
+      date: '2024-09-01',
+      averagePrice: 1.044,
     })
   })
 })

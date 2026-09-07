@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react'
 import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid'
 
 import {
+  getDailyStatisticDetail,
+  type DailyStatisticDetail,
+} from '../data/dailyStatisticDetail.js'
+import {
   getDailyStatistics,
   type DailyStatistic,
   type StatisticSortField,
@@ -35,6 +39,11 @@ export function DailyStatisticsContainer() {
   const [error, setError] = useState(false)
   const [loadAttempt, setLoadAttempt] = useState(0)
   const [display, setDisplay] = useState<StatisticsDisplay>('table')
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [detail, setDetail] = useState<DailyStatisticDetail | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState(false)
+  const [detailLoadAttempt, setDetailLoadAttempt] = useState(0)
   const [dateRange, setDateRange] = useState<DateRange>({ from: '', to: '' })
   const [appliedDateRange, setAppliedDateRange] = useState<DateRange>({
     from: '',
@@ -110,6 +119,30 @@ export function DailyStatisticsContainer() {
     }
   }, [appliedDateRange, display, loadAttempt, month, pagination.page, sortModel])
 
+  useEffect(() => {
+    if (selectedDate === null) return
+
+    let current = true
+    setDetail(null)
+    setDetailLoading(true)
+    setDetailError(false)
+
+    void getDailyStatisticDetail(selectedDate)
+      .then((result) => {
+        if (current) setDetail(result)
+      })
+      .catch(() => {
+        if (current) setDetailError(true)
+      })
+      .finally(() => {
+        if (current) setDetailLoading(false)
+      })
+
+    return () => {
+      current = false
+    }
+  }, [detailLoadAttempt, selectedDate])
+
   function changeMonth(nextMonth: string) {
     setMonth(nextMonth)
   }
@@ -132,6 +165,10 @@ export function DailyStatisticsContainer() {
       display={display}
       dateRange={dateRange}
       invalidDateRange={invalidDateRange}
+      selectedDate={selectedDate}
+      detail={detail}
+      detailLoading={detailLoading}
+      detailError={detailError}
       onMonthChange={changeMonth}
       onDateRangeChange={setDateRange}
       onDateRangeApply={() => {
@@ -149,6 +186,9 @@ export function DailyStatisticsContainer() {
       onSortChange={changeSort}
       onRetry={() => setLoadAttempt((value) => value + 1)}
       onDisplayChange={setDisplay}
+      onDaySelect={setSelectedDate}
+      onDetailBack={() => setSelectedDate(null)}
+      onDetailRetry={() => setDetailLoadAttempt((value) => value + 1)}
     />
   )
 }

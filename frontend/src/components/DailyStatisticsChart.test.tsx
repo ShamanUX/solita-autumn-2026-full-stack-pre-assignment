@@ -4,7 +4,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { DailyStatisticsChart } from './DailyStatisticsChart.js'
 
 const { lineChartMock } = vi.hoisted(() => ({
-  lineChartMock: vi.fn((_props: unknown) => <div data-testid="mui-line-chart" />),
+  lineChartMock: vi.fn((_props: unknown) => (
+    <div data-testid="mui-line-chart" />
+  )),
 }))
 
 vi.mock('@mui/x-charts/LineChart', () => ({ LineChart: lineChartMock }))
@@ -31,10 +33,12 @@ const rows = [
 
 describe('DailyStatisticsChart', () => {
   it('configures chronological series on separate value axes', () => {
+    const onDaySelect = vi.fn()
     render(
       <DailyStatisticsChart
         rows={rows}
         loading={false}
+        onDaySelect={onDaySelect}
       />,
     )
 
@@ -42,6 +46,10 @@ describe('DailyStatisticsChart', () => {
       | {
           dataset: Array<Record<string, unknown>>
           series: Array<{ label: string; yAxisId: string }>
+          onAxisClick: (
+            event: unknown,
+            data: { axisValue?: string | number | Date | null } | null,
+          ) => void
         }
       | undefined
 
@@ -61,6 +69,7 @@ describe('DailyStatisticsChart', () => {
         }),
       ]),
     )
+    props?.onAxisClick({}, { axisValue: '2024-09-19' })
+    expect(onDaySelect).toHaveBeenCalledWith('2024-09-19')
   })
-
 })

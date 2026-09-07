@@ -11,11 +11,9 @@ vi.mock('./DailyStatisticsChart.js', () => ({
 }))
 
 vi.mock('./MonthSelector.js', () => ({
-  MonthSelector: ({
-    onChange,
-  }: {
-    onChange: (month: string) => void
-  }) => <button onClick={() => onChange('2024-08')}>August 2024</button>,
+  MonthSelector: ({ onChange }: { onChange: (month: string) => void }) => (
+    <button onClick={() => onChange('2024-08')}>August 2024</button>
+  ),
 }))
 
 afterEach(cleanup)
@@ -40,6 +38,7 @@ const defaultProps = {
   onPaginationChange: vi.fn(),
   onSortChange: vi.fn(),
   onRetry: vi.fn(),
+  onDaySelect: vi.fn(),
 }
 
 describe('DailyStatisticsDisplay', () => {
@@ -91,11 +90,7 @@ describe('DailyStatisticsDisplay', () => {
     expect(screen.getByText('Loading records...')).toBeInTheDocument()
 
     rerender(
-      <DailyStatisticsDisplay
-        {...defaultProps}
-        error
-        onRetry={onRetry}
-      />,
+      <DailyStatisticsDisplay {...defaultProps} error onRetry={onRetry} />,
     )
     expect(screen.getByText('0 days found')).toBeInTheDocument()
     expect(

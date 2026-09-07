@@ -40,6 +40,7 @@ interface DailyStatisticsDisplayProps {
   onPaginationChange: (pagination: GridPaginationModel) => void
   onSortChange: (sortModel: GridSortModel) => void
   onRetry: () => void
+  onDaySelect: (date: string) => void
 }
 
 export function DailyStatisticsDisplay({
@@ -62,6 +63,7 @@ export function DailyStatisticsDisplay({
   onPaginationChange,
   onSortChange,
   onRetry,
+  onDaySelect,
 }: DailyStatisticsDisplayProps) {
   return (
     <Box
@@ -157,6 +159,7 @@ export function DailyStatisticsDisplay({
         <DailyStatisticsChart
           rows={rows}
           loading={loading}
+          onDaySelect={onDaySelect}
         />
       ) : (
         <DailyStatisticsGrid
@@ -167,6 +170,7 @@ export function DailyStatisticsDisplay({
           loading={loading}
           onPaginationChange={onPaginationChange}
           onSortChange={onSortChange}
+          onDaySelect={onDaySelect}
         />
       )}
     </Box>

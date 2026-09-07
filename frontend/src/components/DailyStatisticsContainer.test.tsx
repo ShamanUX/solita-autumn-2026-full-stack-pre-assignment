@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getDailyStatistics } from '../data/dailyStatistics.js'
+import { getDailyStatisticDetail } from '../data/dailyStatisticDetail.js'
 import { DailyStatisticsContainer } from './DailyStatisticsContainer.js'
 
 vi.mock('../data/dailyStatistics.js', async (importOriginal) => {
@@ -21,9 +22,33 @@ vi.mock('../data/dailyStatistics.js', async (importOriginal) => {
   }
 })
 
+vi.mock('../data/dailyStatisticDetail.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../data/dailyStatisticDetail.js')>()
+
+  return {
+    ...actual,
+    getDailyStatisticDetail: vi.fn(),
+  }
+})
+
 vi.mock('./DailyStatisticsChart.js', () => ({
-  DailyStatisticsChart: () => (
-    <div role="img" aria-label="Daily electricity statistics graph" />
+  DailyStatisticsChart: ({
+    rows,
+    onDaySelect,
+  }: {
+    rows: Array<{ date: string }>
+    onDaySelect: (date: string) => void
+  }) => (
+    <button
+      aria-label="Open graph day"
+      onClick={() => {
+        const date = rows[0]?.date
+        if (date) onDaySelect(date)
+      }}
+    >
+      <span role="img" aria-label="Daily electricity statistics graph" />
+    </button>
   ),
 }))
 
@@ -42,6 +67,7 @@ vi.mock('./MonthSelector.js', () => ({
 }))
 
 const mockedGetDailyStatistics = vi.mocked(getDailyStatistics)
+const mockedGetDailyStatisticDetail = vi.mocked(getDailyStatisticDetail)
 
 const statistic = {
   date: '2024-09-20',
@@ -50,9 +76,33 @@ const statistic = {
   averagePrice: 9.087,
 }
 
+const detail = {
+  date: statistic.date,
+  totalProduction: 729494.4,
+  totalConsumption: 110900952,
+  averagePrice: 9.087,
+  peakConsumptionRatioHour: {
+    startTime: '2024-09-20T09:00:00',
+    production: 22908.13,
+    consumption: 4963616.432,
+    price: 18.824,
+    consumptionProductionRatio: 216.68,
+  },
+  cheapestHours: [
+    {
+      startTime: '2024-09-20T00:00:00',
+      production: 34029.69,
+      consumption: 3766928.185,
+      price: 0.872,
+    },
+  ],
+  hours: [],
+}
+
 afterEach(() => {
   cleanup()
   mockedGetDailyStatistics.mockReset()
+  mockedGetDailyStatisticDetail.mockReset()
 })
 
 beforeEach(() => {
@@ -63,6 +113,7 @@ beforeEach(() => {
         : [statistic]
     return Promise.resolve({ data, total: data.length })
   })
+  mockedGetDailyStatisticDetail.mockResolvedValue(detail)
 })
 
 describe('DailyStatisticsContainer', () => {
@@ -189,8 +240,64 @@ describe('DailyStatisticsContainer', () => {
         name: 'Daily electricity statistics graph',
       }),
     ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Graph' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  it('opens a day and returns to the unchanged overview', async () => {
+    const user = userEvent.setup()
+    render(<DailyStatisticsContainer />)
+    await screen.findByText('1 days found')
+
+    await user.click(screen.getByRole('button', { name: 'View day' }))
+
+    expect(await screen.findByText('Total consumption')).toBeInTheDocument()
+    expect(mockedGetDailyStatisticDetail).toHaveBeenCalledWith('2024-09-20')
+
+    await user.click(
+      screen.getByRole('button', { name: 'Back to daily statistics' }),
+    )
+
+    expect(screen.getByText('1 days found')).toBeInTheDocument()
+    expect(mockedGetDailyStatistics).toHaveBeenCalledOnce()
+  })
+
+  it('opens a plotted day and returns to the graph', async () => {
+    const user = userEvent.setup()
+    render(<DailyStatisticsContainer />)
+    await screen.findByText('1 days found')
+
+    await user.click(screen.getByRole('button', { name: 'Graph' }))
+    await screen.findByRole('button', { name: 'Month 2024-09' })
+    await user.click(screen.getByRole('button', { name: 'Open graph day' }))
+
+    expect(await screen.findByText('Total consumption')).toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', { name: 'Back to daily statistics' }),
+    )
+    expect(screen.getByRole('button', { name: 'Graph' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  it('retries a failed single-day request', async () => {
+    const user = userEvent.setup()
+    mockedGetDailyStatisticDetail.mockRejectedValueOnce(
+      new Error('Unavailable'),
+    )
+    render(<DailyStatisticsContainer />)
+    await screen.findByText('1 days found')
+
+    await user.click(screen.getByRole('button', { name: 'View day' }))
     expect(
-      screen.getByRole('button', { name: 'Graph' }),
-    ).toHaveAttribute('aria-pressed', 'true')
+      await screen.findByText('Statistics for this day could not be loaded.'),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Retry' }))
+
+    expect(await screen.findByText('Total production')).toBeInTheDocument()
+    expect(mockedGetDailyStatisticDetail).toHaveBeenCalledTimes(2)
   })
 })

@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { LineChart } from '@mui/x-charts/LineChart'
 
 import type { DailyStatistic } from '../data/dailyStatistics.js'
@@ -23,6 +23,7 @@ const dateFormatter = new Intl.DateTimeFormat('en-GB', {
 interface DailyStatisticsChartProps {
   rows: DailyStatistic[]
   loading: boolean
+  onDaySelect: (date: string) => void
 }
 
 function formatDate(value: string) {
@@ -32,6 +33,7 @@ function formatDate(value: string) {
 export function DailyStatisticsChart({
   rows,
   loading,
+  onDaySelect,
 }: DailyStatisticsChartProps) {
   const chartRows: Array<Record<string, string | number | null>> = [...rows]
     .sort((first, second) => first.date.localeCompare(second.date))
@@ -48,6 +50,11 @@ export function DailyStatisticsChart({
           dataset={chartRows}
           loading={loading}
           height={360}
+          onAxisClick={(_event, data) => {
+            if (typeof data?.axisValue === 'string') {
+              onDaySelect(data.axisValue)
+            }
+          }}
           xAxis={[
             {
               scaleType: 'point',
@@ -106,6 +113,13 @@ export function DailyStatisticsChart({
           }}
         />
       </Box>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ px: { xs: 2.5, md: 3 }, pb: 2 }}
+      >
+        Select a plotted day to view its totals and hourly insights.
+      </Typography>
     </Box>
   )
 }
