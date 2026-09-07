@@ -4,8 +4,8 @@ import type { Knex } from 'knex'
 
 export interface DailyStatistic {
   date: string
-  averageProduction: number | null
-  averageConsumption: number | null
+  totalProduction: number | null
+  totalConsumption: number | null
   averagePrice: number | null
 }
 
@@ -49,8 +49,8 @@ interface DailyStatisticsQuery {
 
 interface DatabaseDailyStatistic {
   date: string
-  averageProduction: string | null
-  averageConsumption: string | null
+  totalProduction: string | null
+  totalConsumption: string | null
   averagePrice: string | null
 }
 
@@ -67,8 +67,8 @@ interface DatabaseHourlyStatistic {
 
 const sortColumns: Record<SortField, string> = {
   date: 'date',
-  averageProduction: 'averageProduction',
-  averageConsumption: 'averageConsumption',
+  totalProduction: 'totalProduction',
+  totalConsumption: 'totalConsumption',
   averagePrice: 'averagePrice',
 }
 
@@ -292,10 +292,10 @@ export class DailyStatisticsService {
       .clone()
       .select({
         date: this.database.raw("TO_CHAR(??, 'YYYY-MM-DD')", ['date']),
-        averageProduction: this.database.raw('ROUND(AVG(??), 0)', [
+        totalProduction: this.database.raw('ROUND(SUM(??), 0)', [
           'productionamount',
         ]),
-        averageConsumption: this.database.raw('ROUND(AVG(??) / 1000, 0)', [
+        totalConsumption: this.database.raw('ROUND(SUM(??) / 1000, 0)', [
           'consumptionamount',
         ]),
         averagePrice: this.database.raw('ROUND(AVG(??), 3)', ['hourlyprice']),
@@ -318,8 +318,8 @@ export class DailyStatisticsService {
     return {
       data: rows.map((row) => ({
         date: row.date,
-        averageProduction: toNumber(row.averageProduction),
-        averageConsumption: toNumber(row.averageConsumption),
+        totalProduction: toNumber(row.totalProduction),
+        totalConsumption: toNumber(row.totalConsumption),
         averagePrice: toNumber(row.averagePrice),
       })),
       total: Number(count?.total ?? 0),

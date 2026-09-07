@@ -78,16 +78,16 @@ export function DailyStatisticsChart({
           ]}
           series={[
             {
-              dataKey: 'averageProduction',
-              label: 'Production average (MWh)',
+              dataKey: 'totalProduction',
+              label: 'Total production (MWh)',
               yAxisId: 'electricity',
               color: '#d7ff3f',
               valueFormatter: (value) =>
                 value === null ? 'Not available' : valueFormatter.format(value),
             },
             {
-              dataKey: 'averageConsumption',
-              label: 'Consumption average (MWh)',
+              dataKey: 'totalConsumption',
+              label: 'Total consumption (MWh)',
               yAxisId: 'electricity',
               color: '#66c7f2',
               valueFormatter: (value) =>

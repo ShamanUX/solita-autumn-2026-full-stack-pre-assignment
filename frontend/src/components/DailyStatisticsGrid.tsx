@@ -33,8 +33,8 @@ const columns: GridColDef<DailyStatistic>[] = [
       dateFormatter.format(new Date(`${value}T00:00:00Z`)),
   },
   {
-    field: 'averageProduction',
-    headerName: 'Production average (MWh)',
+    field: 'totalProduction',
+    headerName: 'Total production (MWh)',
     minWidth: 205,
     flex: 1,
     align: 'right',
@@ -43,8 +43,8 @@ const columns: GridColDef<DailyStatistic>[] = [
       value === null ? 'Not available' : numberFormatter.format(value),
   },
   {
-    field: 'averageConsumption',
-    headerName: 'Consumption average (MWh)',
+    field: 'totalConsumption',
+    headerName: 'Total consumption (MWh)',
     minWidth: 215,
     flex: 1,
     align: 'right',

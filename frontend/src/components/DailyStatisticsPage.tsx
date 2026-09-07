@@ -153,8 +153,8 @@ export function DailyStatisticsPage({
               mt: { xs: 3, md: 1 },
             }}
           >
-            Compare daily averages calculated from hourly production,
-            consumption, and market price observations.
+            Compare daily production and consumption totals with average market
+            prices calculated from hourly observations.
           </Typography>
         </Box>
 

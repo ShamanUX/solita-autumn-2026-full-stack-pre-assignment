@@ -29,13 +29,13 @@ describe('daily statistics service', () => {
     expect(result.data).toHaveLength(10)
     expect(result.data[0]).toEqual({
       date: '2024-10-01',
-      averageProduction: 34252,
-      averageConsumption: null,
+      totalProduction: 719282,
+      totalConsumption: null,
       averagePrice: 5.83,
     })
   })
 
-  it('filters dates inclusively and returns rounded numeric averages', async () => {
+  it('filters dates inclusively and returns rounded numeric statistics', async () => {
     const result = await app.service('daily-statistics').find({
       query: {
         from: '2024-09-01',
@@ -47,8 +47,8 @@ describe('daily statistics service', () => {
       data: [
         {
           date: '2024-09-01',
-          averageProduction: 29941,
-          averageConsumption: 4033,
+          totalProduction: 718585,
+          totalConsumption: 96803,
           averagePrice: 1.044,
         },
       ],
@@ -113,7 +113,7 @@ describe('daily statistics service', () => {
       query: {
         from: '2023-07-31',
         to: '2023-08-01',
-        sortField: 'averageConsumption',
+        sortField: 'totalConsumption',
         sortDirection: 'desc',
       },
     })
@@ -123,13 +123,13 @@ describe('daily statistics service', () => {
       '2024-09-28',
     ])
     expect(
-      sorted.data.map(({ date, averageConsumption }) => ({
+      sorted.data.map(({ date, totalConsumption }) => ({
         date,
-        averageConsumption,
+        totalConsumption,
       })),
     ).toEqual([
-      { date: '2023-08-01', averageConsumption: 4220 },
-      { date: '2023-07-31', averageConsumption: null },
+      { date: '2023-08-01', totalConsumption: 101279 },
+      { date: '2023-07-31', totalConsumption: null },
     ])
   })
 
