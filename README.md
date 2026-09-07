@@ -25,9 +25,10 @@ at <http://localhost:8088/>.
 
 ## Daily statistics API
 
-`GET /daily-statistics` returns daily production and consumption totals and the
-average price calculated from the available hourly values. The response contains a
-`data` array and the total number of matching dates in `total`.
+`GET /daily-statistics` returns daily production and consumption totals, the
+average price, and the longest consecutive negative-price period in hours. The
+response contains a `data` array and the total number of matching dates in
+`total`.
 Production and consumption are returned in a common MWh scale: source
 consumption values are converted from kWh to MWh. Prices retain their source
 unit of c/kWh. Daily MWh totals are rounded to whole numbers.
@@ -35,11 +36,15 @@ unit of c/kWh. Daily MWh totals are rounded to whole numbers.
 The endpoint accepts inclusive `from` and `to` dates in `YYYY-MM-DD` format,
 zero-based `page`, `pageSize` up to 100, `sortField`, and `sortDirection`.
 Supported sort fields are `date`, `totalProduction`, `totalConsumption`,
-and `averagePrice`. For example:
+`averagePrice`, and `longestNegativePriceStreakHours`. For example:
 
 ```text
 http://localhost:3030/daily-statistics?from=2024-09-01&to=2024-09-30&page=0&pageSize=10&sortField=date&sortDirection=desc
 ```
+
+Positive, zero, missing, and non-consecutive hourly observations break a
+negative-price streak. The value is `0` when a day has price observations but
+none are negative, and `null` when the day has no price observations.
 
 `GET /daily-statistics/:date` returns details for one date. The response
 contains hourly observations, daily production and consumption totals, average
@@ -111,3 +116,4 @@ AI has been used to:
 - Plan folder structure
 - Help create in-depth specifications for features and tests, and run the implementation to create PRs that are comfortably sized to be reviewed by a human.
 - Update docs with up-to-date information.
+- Design, implement, and test the consecutive negative-price calculation.

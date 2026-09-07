@@ -62,6 +62,16 @@ const columns: GridColDef<DailyStatistic>[] = [
     valueFormatter: (value: number | null) =>
       value === null ? 'Not available' : priceFormatter.format(value),
   },
+  {
+    field: 'longestNegativePriceStreakHours',
+    headerName: 'Longest negative-price streak (h)',
+    minWidth: 225,
+    flex: 1,
+    align: 'right',
+    headerAlign: 'right',
+    valueFormatter: (value: number | null) =>
+      value === null ? 'Not available' : numberFormatter.format(value),
+  },
 ]
 
 interface DailyStatisticsGridProps {

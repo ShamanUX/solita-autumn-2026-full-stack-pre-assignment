@@ -7,6 +7,7 @@ export interface DailyStatistic {
   totalProduction: number | null
   totalConsumption: number | null
   averagePrice: number | null
+  longestNegativePriceStreakHours: number | null
 }
 
 export interface DailyStatisticsPage {
@@ -52,6 +53,7 @@ interface DatabaseDailyStatistic {
   totalProduction: string | null
   totalConsumption: string | null
   averagePrice: string | null
+  longestNegativePriceStreakHours: string | null
 }
 
 interface DatabaseCount {
@@ -70,6 +72,7 @@ const sortColumns: Record<SortField, string> = {
   totalProduction: 'totalProduction',
   totalConsumption: 'totalConsumption',
   averagePrice: 'averagePrice',
+  longestNegativePriceStreakHours: 'longestNegativePriceStreakHours',
 }
 
 function parseDate(value: unknown, name: string): string | undefined {
@@ -283,24 +286,70 @@ export class DailyStatisticsService {
   ): Promise<DailyStatisticsPage> {
     const query = parseQuery(params?.query)
     console.debug('Fetching daily statistics from database', query)
-    const filteredRows = this.database('electricitydata').whereNotNull('date')
+    const filteredRows = this.database('electricitydata').whereNotNull(
+      'electricitydata.date',
+    )
+    const negativeHours = this.database('electricitydata')
+      .select({ date: 'date' })
+      .select({
+        streakGroup: this.database.raw(
+          `?? - ROW_NUMBER() OVER (PARTITION BY ?? ORDER BY ??) * INTERVAL '1 hour'`,
+          ['starttime', 'date', 'starttime'],
+        ),
+      })
+      .whereNotNull('date')
+      .whereNotNull('starttime')
+      .where('hourlyprice', '<', 0)
 
-    if (query.from) filteredRows.where('date', '>=', query.from)
-    if (query.to) filteredRows.where('date', '<=', query.to)
+    if (query.from) {
+      filteredRows.where('electricitydata.date', '>=', query.from)
+      negativeHours.where('date', '>=', query.from)
+    }
+    if (query.to) {
+      filteredRows.where('electricitydata.date', '<=', query.to)
+      negativeHours.where('date', '<=', query.to)
+    }
+
+    const negativeStreaks = this.database
+      .from(negativeHours.as('negativeHours'))
+      .select('date', 'streakGroup')
+      .count({ streakHours: '*' })
+      .groupBy('date', 'streakGroup')
+    const longestNegativeStreaks = this.database
+      .from(negativeStreaks.as('negativeStreaks'))
+      .select('date')
+      .max({ longestNegativePriceStreakHours: 'streakHours' })
+      .groupBy('date')
 
     const statisticsQuery = filteredRows
       .clone()
+      .leftJoin(
+        longestNegativeStreaks.as('longestNegativeStreaks'),
+        'electricitydata.date',
+        'longestNegativeStreaks.date',
+      )
       .select({
-        date: this.database.raw("TO_CHAR(??, 'YYYY-MM-DD')", ['date']),
+        date: this.database.raw("TO_CHAR(??, 'YYYY-MM-DD')", [
+          'electricitydata.date',
+        ]),
         totalProduction: this.database.raw('ROUND(SUM(??), 0)', [
-          'productionamount',
+          'electricitydata.productionamount',
         ]),
         totalConsumption: this.database.raw('ROUND(SUM(??) / 1000, 0)', [
-          'consumptionamount',
+          'electricitydata.consumptionamount',
         ]),
-        averagePrice: this.database.raw('ROUND(AVG(??), 3)', ['hourlyprice']),
+        averagePrice: this.database.raw('ROUND(AVG(??), 3)', [
+          'electricitydata.hourlyprice',
+        ]),
+        longestNegativePriceStreakHours: this.database.raw(
+          'CASE WHEN COUNT(??) = 0 THEN NULL ELSE COALESCE(MAX(??), 0) END',
+          [
+            'electricitydata.hourlyprice',
+            'longestNegativeStreaks.longestNegativePriceStreakHours',
+          ],
+        ),
       })
-      .groupBy('date')
+      .groupBy('electricitydata.date')
       .orderBy(sortColumns[query.sortField], query.sortDirection, 'last')
       .limit(query.pageSize)
       .offset(query.page * query.pageSize)
@@ -321,6 +370,9 @@ export class DailyStatisticsService {
         totalProduction: toNumber(row.totalProduction),
         totalConsumption: toNumber(row.totalConsumption),
         averagePrice: toNumber(row.averagePrice),
+        longestNegativePriceStreakHours: toNumber(
+          row.longestNegativePriceStreakHours,
+        ),
       })),
       total: Number(count?.total ?? 0),
     }

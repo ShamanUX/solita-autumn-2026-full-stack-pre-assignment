@@ -22,12 +22,14 @@ const rows = [
     totalProduction: 729494,
     totalConsumption: 110901,
     averagePrice: 9.087,
+    longestNegativePriceStreakHours: 4,
   },
   {
     date: '2024-09-19',
     totalProduction: 717120,
     totalConsumption: 108240,
     averagePrice: 8.942,
+    longestNegativePriceStreakHours: 0,
   },
 ]
 

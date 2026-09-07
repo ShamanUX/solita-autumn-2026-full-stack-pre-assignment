@@ -32,6 +32,7 @@ describe('daily statistics service', () => {
       totalProduction: 719282,
       totalConsumption: null,
       averagePrice: 5.83,
+      longestNegativePriceStreakHours: 0,
     })
   })
 
@@ -50,6 +51,7 @@ describe('daily statistics service', () => {
           totalProduction: 718585,
           totalConsumption: 96803,
           averagePrice: 1.044,
+          longestNegativePriceStreakHours: 0,
         },
       ],
       total: 1,
@@ -131,6 +133,36 @@ describe('daily statistics service', () => {
       { date: '2023-08-01', totalConsumption: 101279 },
       { date: '2023-07-31', totalConsumption: null },
     ])
+  })
+
+  it('returns and sorts the longest consecutive negative-price streak', async () => {
+    const splitStreaks = await app.service('daily-statistics').find({
+      query: { from: '2024-09-10', to: '2024-09-10' },
+    })
+    const sorted = await app.service('daily-statistics').find({
+      query: {
+        from: '2024-08-24',
+        to: '2024-08-26',
+        sortField: 'longestNegativePriceStreakHours',
+        sortDirection: 'desc',
+      },
+    })
+    const unavailable = await app.service('daily-statistics').find({
+      query: { from: '2020-12-31', to: '2020-12-31' },
+    })
+
+    expect(splitStreaks.data[0]?.longestNegativePriceStreakHours).toBe(7)
+    expect(
+      sorted.data.map(({ date, longestNegativePriceStreakHours }) => ({
+        date,
+        longestNegativePriceStreakHours,
+      })),
+    ).toEqual([
+      { date: '2024-08-25', longestNegativePriceStreakHours: 24 },
+      { date: '2024-08-24', longestNegativePriceStreakHours: 19 },
+      { date: '2024-08-26', longestNegativePriceStreakHours: 9 },
+    ])
+    expect(unavailable.data[0]?.longestNegativePriceStreakHours).toBeNull()
   })
 
   it.each([
