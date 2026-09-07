@@ -142,8 +142,8 @@ const mockedGetDailyStatisticDetail = vi.mocked(getDailyStatisticDetail)
 
 const statistic = {
   date: '2024-09-20',
-  averageProduction: 30396,
-  averageConsumption: 4621,
+  totalProduction: 729494,
+  totalConsumption: 110901,
   averagePrice: 9.087,
 }
 
@@ -261,7 +261,7 @@ describe('DailyStatisticsContainer', () => {
     })
   })
 
-  it('loads all daily averages for a selected month', async () => {
+  it('loads all daily statistics for a selected month', async () => {
     const user = userEvent.setup()
     render(<DailyStatisticsContainer />)
     await screen.findByText('1 days found')

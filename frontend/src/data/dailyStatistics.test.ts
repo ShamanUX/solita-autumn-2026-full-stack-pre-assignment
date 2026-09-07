@@ -18,8 +18,8 @@ const page = {
   data: [
     {
       date: '2024-09-01',
-      averageProduction: 29941,
-      averageConsumption: 4033,
+      totalProduction: 718585,
+      totalConsumption: 96803,
       averagePrice: 1.044,
     },
   ],

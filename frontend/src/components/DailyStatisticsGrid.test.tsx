@@ -10,8 +10,8 @@ const defaultProps = {
   rows: [
     {
       date: '2024-09-20',
-      averageProduction: 30396,
-      averageConsumption: 4621,
+      totalProduction: 729494,
+      totalConsumption: 110901,
       averagePrice: 9.087,
     },
   ],
@@ -36,19 +36,19 @@ describe('DailyStatisticsGrid', () => {
 
     expect(
       screen.getByRole('columnheader', {
-        name: 'Production average (MWh)',
+        name: 'Total production (MWh)',
       }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('columnheader', {
-        name: 'Consumption average (MWh)',
+        name: 'Total consumption (MWh)',
       }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('columnheader', { name: 'Price average (c/kWh)' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByText((content) => content.replace(/\s/g, '') === '30396'),
+      screen.getByText((content) => content.replace(/\s/g, '') === '729494'),
     ).toBeInTheDocument()
     expect(screen.getByText('9,087')).toBeInTheDocument()
   })

@@ -19,14 +19,14 @@ afterEach(() => {
 const rows = [
   {
     date: '2024-09-20',
-    averageProduction: 30396,
-    averageConsumption: 4621,
+    totalProduction: 729494,
+    totalConsumption: 110901,
     averagePrice: 9.087,
   },
   {
     date: '2024-09-19',
-    averageProduction: 29880,
-    averageConsumption: 4510,
+    totalProduction: 717120,
+    totalConsumption: 108240,
     averagePrice: 8.942,
   },
 ]
@@ -74,7 +74,7 @@ describe('DailyStatisticsChart', () => {
     expect(props?.series).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: 'Production average (MWh)',
+          label: 'Total production (MWh)',
           yAxisId: 'electricity',
         }),
         expect.objectContaining({

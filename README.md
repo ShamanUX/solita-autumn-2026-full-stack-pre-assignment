@@ -36,16 +36,16 @@ host.
 
 ### Daily statistics API
 
-`GET /daily-statistics` returns daily averages calculated from the available
-hourly production, consumption, and price values. The response contains a
+`GET /daily-statistics` returns daily production and consumption totals and the
+average price calculated from the available hourly values. The response contains a
 `data` array and the total number of matching dates in `total`.
 Production and consumption are returned in a common MWh scale: source
 consumption values are converted from kWh to MWh. Prices retain their source
-unit of c/kWh. Daily MWh averages and totals are rounded to whole numbers.
+unit of c/kWh. Daily MWh totals are rounded to whole numbers.
 
 The endpoint accepts inclusive `from` and `to` dates in `YYYY-MM-DD` format,
 zero-based `page`, `pageSize` up to 100, `sortField`, and `sortDirection`.
-Supported sort fields are `date`, `averageProduction`, `averageConsumption`,
+Supported sort fields are `date`, `totalProduction`, `totalConsumption`,
 and `averagePrice`. For example:
 
 ```text
@@ -95,3 +95,4 @@ So far, AI has been used to:
 - I direct AI to write sufficiently concise changes as separate PRs.
 - implement and test the single-day electricity statistics drill-down.
 - normalize electricity units and apply Finnish number formatting.
+- Correct the daily overview aggregation from hourly averages to daily totals.

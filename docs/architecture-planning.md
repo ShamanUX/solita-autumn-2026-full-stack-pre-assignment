@@ -23,8 +23,8 @@ separate Node.js container after PostgreSQL is healthy. A health endpoint and
 integration test will verify the database connection.
 
 The read-only `daily-statistics` Feathers service groups the source rows by
-date and calculates averages for the available production, consumption, and
-price observations. Its REST endpoint provides inclusive date filtering,
+date and calculates production and consumption totals and average price from
+the available observations. Its REST endpoint provides inclusive date filtering,
 server-side pagination, and allowlisted single-column ordering. Missing
 measurements remain `null` rather than being treated as zero.
 Source consumption values are converted from kWh to MWh at the service
@@ -43,9 +43,9 @@ The React frontend will feature no routing for this usecase. We follow the Conta
 
 `DailyStatisticsContainer` owns API, graph month, table date range, pagination,
 sorting, and display-mode state. The table requests server-paginated sets of 10
-daily averages with its independently applied optional date range. The graph
+daily statistics with its independently applied optional date range. The graph
 defaults to September 2024, and each selected month is loaded in one bounded API
-request containing at most 31 daily averages. Table and graph results have
+request containing at most 31 daily statistics. Table and graph results have
 independent state and are retained across display changes, so switching modes
 does not repeat an unchanged query.
 `DailyStatisticsPage` composes controlled presentational components.
