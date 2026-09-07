@@ -1,4 +1,4 @@
-import { createApp } from './app.js'
+import { createApp } from './application.js'
 
 const app = createApp()
 const host = process.env.HOST ?? '0.0.0.0'

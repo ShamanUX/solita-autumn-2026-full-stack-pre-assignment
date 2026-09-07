@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { createApp } from '../src/app.js'
+import { createApp } from '../src/application.js'
 
 const app = createApp()
 
