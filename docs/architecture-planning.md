@@ -48,15 +48,15 @@ defaults to September 2024, and each selected month is loaded in one bounded API
 request containing at most 31 daily averages. Table and graph results have
 independent state and are retained across display changes, so switching modes
 does not repeat an unchanged query.
-`DailyStatisticsView` composes controlled presentational components.
+`DailyStatisticsPage` composes controlled presentational components.
 
-`DailyStatisticsDisplay` provides the table/graph switch and renders the active
+`DailyStatisticsOverview` provides the table/graph switch and renders the active
 mode's loading and error state. Its MUI month picker is shown only for the graph,
 and its MUI date pickers are shown only for the table's date range filter. The
 table uses server-side pagination and sorting, while the graph keeps electricity
 values and price on separate axes because they use different scales.
 
-Selecting a table action or a plotted graph day opens `SingleDayView` in the
+Selecting a table action or a plotted graph day opens `SingleDayDetails` in the
 same content panel. The container loads the selected date independently and
 retains the overview's display mode, month, date range, page, and sorting so the
 Back action restores the previous context without refetching it. No router is

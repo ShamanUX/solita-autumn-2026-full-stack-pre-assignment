@@ -2,7 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { SingleDayView } from './SingleDayView.js'
+import { SingleDayDetails } from './SingleDayDetails.js'
 
 afterEach(cleanup)
 
@@ -29,10 +29,10 @@ const detail = {
   hours: [],
 }
 
-describe('SingleDayView', () => {
+describe('SingleDayDetails', () => {
   it('shows daily summaries and cheapest hours', () => {
     render(
-      <SingleDayView
+      <SingleDayDetails
         date={detail.date}
         detail={detail}
         loading={false}
@@ -56,7 +56,7 @@ describe('SingleDayView', () => {
     const user = userEvent.setup()
     const onBack = vi.fn()
     render(
-      <SingleDayView
+      <SingleDayDetails
         date={detail.date}
         detail={{
           ...detail,

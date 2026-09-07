@@ -5,13 +5,13 @@ import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid'
 import type { DailyStatistic } from '../data/dailyStatistics.js'
 import type { DailyStatisticDetail } from '../data/dailyStatisticDetail.js'
 import {
-  DailyStatisticsDisplay,
-  type StatisticsDisplay,
-} from './DailyStatisticsDisplay.js'
+  DailyStatisticsOverview,
+  type StatisticsMode,
+} from './DailyStatisticsOverview.js'
 import type { DateRange } from './DateRangeFilter.js'
-import { SingleDayView } from './SingleDayView.js'
+import { SingleDayDetails } from './SingleDayDetails.js'
 
-interface DailyStatisticsViewProps {
+interface DailyStatisticsPageProps {
   month: string
   latestMonth: string
   rows: DailyStatistic[]
@@ -20,7 +20,7 @@ interface DailyStatisticsViewProps {
   sortModel: GridSortModel
   loading: boolean
   error: boolean
-  display: StatisticsDisplay
+  mode: StatisticsMode
   dateRange: DateRange
   invalidDateRange: boolean
   selectedDate: string | null
@@ -34,13 +34,13 @@ interface DailyStatisticsViewProps {
   onPaginationChange: (pagination: GridPaginationModel) => void
   onSortChange: (sortModel: GridSortModel) => void
   onRetry: () => void
-  onDisplayChange: (display: StatisticsDisplay) => void
+  onModeChange: (mode: StatisticsMode) => void
   onDaySelect: (date: string) => void
   onDetailBack: () => void
   onDetailRetry: () => void
 }
 
-export function DailyStatisticsView({
+export function DailyStatisticsPage({
   month,
   latestMonth,
   rows,
@@ -49,7 +49,7 @@ export function DailyStatisticsView({
   sortModel,
   loading,
   error,
-  display,
+  mode,
   dateRange,
   invalidDateRange,
   selectedDate,
@@ -63,11 +63,11 @@ export function DailyStatisticsView({
   onPaginationChange,
   onSortChange,
   onRetry,
-  onDisplayChange,
+  onModeChange,
   onDaySelect,
   onDetailBack,
   onDetailRetry,
-}: DailyStatisticsViewProps) {
+}: DailyStatisticsPageProps) {
   return (
     <Box
       sx={{
@@ -170,7 +170,7 @@ export function DailyStatisticsView({
           }}
         >
           <Box
-            key={selectedDate ?? display}
+            key={selectedDate ?? mode}
             sx={{
               display: 'flex',
               flex: 1,
@@ -187,8 +187,8 @@ export function DailyStatisticsView({
             }}
           >
             {selectedDate === null ? (
-              <DailyStatisticsDisplay
-                display={display}
+              <DailyStatisticsOverview
+                mode={mode}
                 month={month}
                 latestMonth={latestMonth}
                 rows={rows}
@@ -202,7 +202,7 @@ export function DailyStatisticsView({
                 onPaginationChange={onPaginationChange}
                 onSortChange={onSortChange}
                 onRetry={onRetry}
-                onDisplayChange={onDisplayChange}
+                onModeChange={onModeChange}
                 onMonthChange={onMonthChange}
                 onDateRangeChange={onDateRangeChange}
                 onDateRangeApply={onDateRangeApply}
@@ -210,7 +210,7 @@ export function DailyStatisticsView({
                 onDaySelect={onDaySelect}
               />
             ) : (
-              <SingleDayView
+              <SingleDayDetails
                 date={selectedDate}
                 detail={detail}
                 loading={detailLoading}

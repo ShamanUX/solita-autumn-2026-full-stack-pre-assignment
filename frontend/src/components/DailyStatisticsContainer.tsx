@@ -10,8 +10,8 @@ import {
   type DailyStatistic,
   type StatisticSortField,
 } from '../data/dailyStatistics.js'
-import type { StatisticsDisplay } from './DailyStatisticsDisplay.js'
-import { DailyStatisticsView } from './DailyStatisticsView.js'
+import type { StatisticsMode } from './DailyStatisticsOverview.js'
+import { DailyStatisticsPage } from './DailyStatisticsPage.js'
 import type { DateRange } from './DateRangeFilter.js'
 
 function getMonthEnd(month: string) {
@@ -42,7 +42,7 @@ export function DailyStatisticsContainer() {
   const [sortModel, setSortModel] = useState<GridSortModel>([
     { field: 'date', sort: 'desc' },
   ])
-  const [display, setDisplay] = useState<StatisticsDisplay>('table')
+  const [mode, setMode] = useState<StatisticsMode>('table')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [detail, setDetail] = useState<DailyStatisticDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
@@ -154,20 +154,20 @@ export function DailyStatisticsContainer() {
     setPagination((current) => ({ ...current, page: 0 }))
   }
 
-  function changeDisplay(nextDisplay: StatisticsDisplay) {
-    if (nextDisplay === 'graph' && !graphActivated) {
+  function changeMode(nextMode: StatisticsMode) {
+    if (nextMode === 'graph' && !graphActivated) {
       setGraphLoading(true)
       setGraphActivated(true)
     }
-    setDisplay(nextDisplay)
+    setMode(nextMode)
   }
 
-  const rows = display === 'table' ? tableRows : graphRows
-  const loading = display === 'table' ? tableLoading : graphLoading
-  const error = display === 'table' ? tableError : graphError
+  const rows = mode === 'table' ? tableRows : graphRows
+  const loading = mode === 'table' ? tableLoading : graphLoading
+  const error = mode === 'table' ? tableError : graphError
 
   return (
-    <DailyStatisticsView
+    <DailyStatisticsPage
       month={month}
       latestMonth=""
       rows={rows}
@@ -176,7 +176,7 @@ export function DailyStatisticsContainer() {
       sortModel={sortModel}
       loading={loading}
       error={error}
-      display={display}
+      mode={mode}
       dateRange={dateRange}
       invalidDateRange={invalidDateRange}
       selectedDate={selectedDate}
@@ -199,13 +199,13 @@ export function DailyStatisticsContainer() {
       onPaginationChange={setPagination}
       onSortChange={changeSort}
       onRetry={() => {
-        if (display === 'table') {
+        if (mode === 'table') {
           setTableLoadAttempt((value) => value + 1)
         } else {
           setGraphLoadAttempt((value) => value + 1)
         }
       }}
-      onDisplayChange={changeDisplay}
+      onModeChange={changeMode}
       onDaySelect={setSelectedDate}
       onDetailBack={() => setSelectedDate(null)}
       onDetailRetry={() => setDetailLoadAttempt((value) => value + 1)}
