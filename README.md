@@ -60,8 +60,9 @@ npm install
 npm run dev:frontend
 ```
 
-Open <http://localhost:5173/>. Date filtering, sorting, and pagination are
-handled by the API. Run the frontend production build and tests with:
+Open <http://localhost:5173/>. The month picker defaults to the latest available
+month and loads its daily averages for the graph and table. Run the frontend
+production build and tests with:
 
 ```sh
 npm run build --workspace frontend
@@ -81,7 +82,4 @@ So far, AI has been used to:
 - run installation for agreed upon architecture
 - AI suggested Fastify for backend framework. I looked up alternatives and chose Feathers.js, seemed solid and it's nice to try new tech in tasks like this.
 - Plan folder structure -> kept Docker files in root, add frontend/ and backend/ folders, with tsconfig file for each.
-- implement and verify the initial Feathers database health check and Docker integration.
-- Plan PR implementation steps. I direct the AI to implement logical parts of the software as separate PRs.
-- bootstrap, implement, and test the fixture-backed React statistics interface.
-- replace the frontend fixtures with the backend API integration and update its tests.
+- I direct AI to write sufficiently concise changes as separate PRs.

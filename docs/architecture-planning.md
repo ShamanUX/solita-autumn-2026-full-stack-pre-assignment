@@ -32,6 +32,25 @@ measurements remain `null` rather than being treated as zero.
 
 The React frontend will feature no routing for this usecase. We follow the Container and Presentational Component pattern, separating logic and visual components.
 
+`DailyStatisticsContainer` owns API, graph month, table date range, pagination,
+sorting, and display-mode state. The table requests server-paginated sets of 10
+daily averages with its independently applied optional date range. When the
+graph is opened, it requests the latest available date and uses its month as the
+default. Each selected month is then loaded in one bounded API request
+containing at most 31 daily averages.
+`DailyStatisticsView` composes controlled presentational components.
+
+`DailyStatisticsDisplay` provides the table/graph switch and shared loading and
+error states. Its MUI month picker is shown only for the graph, and its date
+range filter is shown only for the table. The table uses server-side pagination
+and sorting, while the graph keeps electricity values and price on separate
+axes because they use different scales.
+
+On desktop, the page uses the available `100vh` with a `900px` minimum height.
+This keeps the controls and active data view in one viewport at normal desktop
+sizes while allowing the document to scroll on shorter screens. Mobile retains
+content-driven height so the controls and visualizations do not become cramped.
+
 Data flows down from the container through props, and user actions flow back up
 through callbacks. This keeps API and state transitions separate from rendering
 without introducing a global state library for the current scope.

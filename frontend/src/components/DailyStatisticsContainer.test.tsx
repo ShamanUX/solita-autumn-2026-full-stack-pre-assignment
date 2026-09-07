@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -15,6 +21,26 @@ vi.mock('../data/dailyStatistics.js', async (importOriginal) => {
   }
 })
 
+vi.mock('./DailyStatisticsChart.js', () => ({
+  DailyStatisticsChart: () => (
+    <div role="img" aria-label="Daily electricity statistics graph" />
+  ),
+}))
+
+vi.mock('./MonthSelector.js', () => ({
+  MonthSelector: ({
+    month,
+    onChange,
+  }: {
+    month: string
+    onChange: (month: string) => void
+  }) => (
+    <button onClick={() => onChange('2024-08')}>
+      Month {month || 'not selected'}
+    </button>
+  ),
+}))
+
 const mockedGetDailyStatistics = vi.mocked(getDailyStatistics)
 
 const statistic = {
@@ -30,21 +56,24 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  mockedGetDailyStatistics.mockImplementation(({ from }) =>
-    Promise.resolve({
-      data: [statistic],
-      total: from === '2024-09-15' ? 6 : 20,
-    }),
-  )
+  mockedGetDailyStatistics.mockImplementation(({ from }) => {
+    const data =
+      from === '2024-08-01'
+        ? [{ ...statistic, date: '2024-08-20' }]
+        : [statistic]
+    return Promise.resolve({ data, total: data.length })
+  })
 })
 
 describe('DailyStatisticsContainer', () => {
-  it('loads statistics with the initial query', async () => {
+  it('loads an unfiltered page of 10 table rows', async () => {
     render(<DailyStatisticsContainer />)
 
     expect(screen.getByText('Loading records...')).toBeInTheDocument()
-    expect(await screen.findByText('20 days found')).toBeInTheDocument()
+    expect(await screen.findByText('1 days found')).toBeInTheDocument()
     expect(screen.getByText('20 Sept 2024')).toBeInTheDocument()
+    expect(screen.queryByText(/Month /)).not.toBeInTheDocument()
+    expect(mockedGetDailyStatistics).toHaveBeenCalledOnce()
     expect(mockedGetDailyStatistics).toHaveBeenCalledWith({
       from: '',
       to: '',
@@ -55,25 +84,82 @@ describe('DailyStatisticsContainer', () => {
     })
   })
 
-  it('applies and clears an inclusive date range', async () => {
+  it('applies a date range only to the table', async () => {
     const user = userEvent.setup()
     render(<DailyStatisticsContainer />)
-    await screen.findByText('20 days found')
+    await screen.findByText('1 days found')
 
     fireEvent.change(screen.getByLabelText('From'), {
-      target: { value: '2024-09-15' },
+      target: { value: '2024-09-01' },
+    })
+    fireEvent.change(screen.getByLabelText('To'), {
+      target: { value: '2024-09-30' },
     })
     await user.click(screen.getByRole('button', { name: 'Apply dates' }))
 
-    expect(await screen.findByText('6 days found')).toBeInTheDocument()
-    expect(mockedGetDailyStatistics).toHaveBeenLastCalledWith(
-      expect.objectContaining({ from: '2024-09-15', to: '' }),
-    )
+    expect(mockedGetDailyStatistics).toHaveBeenLastCalledWith({
+      from: '2024-09-01',
+      to: '2024-09-30',
+      page: 0,
+      pageSize: 10,
+      sortField: 'date',
+      sortDirection: 'desc',
+    })
 
-    await user.click(screen.getByRole('button', { name: 'Clear' }))
+    await user.click(screen.getByRole('button', { name: 'Graph' }))
+    expect(screen.queryByLabelText('From')).not.toBeInTheDocument()
+  })
 
-    expect(await screen.findByText('20 days found')).toBeInTheDocument()
-    expect(screen.getByLabelText('From')).toHaveValue('')
+  it('discovers and loads the latest available month for the graph', async () => {
+    const user = userEvent.setup()
+    render(<DailyStatisticsContainer />)
+    await screen.findByText('1 days found')
+
+    await user.click(screen.getByRole('button', { name: 'Graph' }))
+
+    expect(
+      await screen.findByRole('button', { name: 'Month 2024-09' }),
+    ).toBeInTheDocument()
+    expect(mockedGetDailyStatistics).toHaveBeenNthCalledWith(2, {
+      from: '',
+      to: '',
+      page: 0,
+      pageSize: 1,
+      sortField: 'date',
+      sortDirection: 'desc',
+    })
+    expect(mockedGetDailyStatistics).toHaveBeenLastCalledWith({
+      from: '2024-09-01',
+      to: '2024-09-30',
+      page: 0,
+      pageSize: 31,
+      sortField: 'date',
+      sortDirection: 'asc',
+    })
+  })
+
+  it('loads all daily averages for a selected month', async () => {
+    const user = userEvent.setup()
+    render(<DailyStatisticsContainer />)
+    await screen.findByText('1 days found')
+
+    await user.click(screen.getByRole('button', { name: 'Graph' }))
+    await screen.findByRole('button', { name: 'Month 2024-09' })
+    await user.click(screen.getByRole('button', { name: 'Month 2024-09' }))
+
+    expect(
+      await screen.findByRole('button', { name: 'Month 2024-08' }),
+    ).toBeInTheDocument()
+    await waitFor(() => {
+      expect(mockedGetDailyStatistics).toHaveBeenLastCalledWith({
+        from: '2024-08-01',
+        to: '2024-08-31',
+        page: 0,
+        pageSize: 31,
+        sortField: 'date',
+        sortDirection: 'asc',
+      })
+    })
   })
 
   it('retries a failed request', async () => {
@@ -87,7 +173,24 @@ describe('DailyStatisticsContainer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Retry' }))
 
-    expect(await screen.findByText('20 days found')).toBeInTheDocument()
+    expect(await screen.findByText('1 days found')).toBeInTheDocument()
     expect(mockedGetDailyStatistics).toHaveBeenCalledTimes(2)
+  })
+
+  it('switches between the data table and graph', async () => {
+    const user = userEvent.setup()
+    render(<DailyStatisticsContainer />)
+    await screen.findByText('1 days found')
+
+    await user.click(screen.getByRole('button', { name: 'Graph' }))
+
+    expect(
+      screen.getByRole('img', {
+        name: 'Daily electricity statistics graph',
+      }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Graph' }),
+    ).toHaveAttribute('aria-pressed', 'true')
   })
 })

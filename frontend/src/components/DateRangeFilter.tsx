@@ -27,7 +27,10 @@ export function DateRangeFilter({
         event.preventDefault()
         onApply()
       }}
-      sx={{ p: { xs: 2.5, md: 3 } }}
+      sx={{
+        p: { xs: 2.5, md: 2 },
+        '& input[type="date"]': { colorScheme: 'dark' },
+      }}
     >
       <Stack
         direction={{ xs: 'column', md: 'row' }}

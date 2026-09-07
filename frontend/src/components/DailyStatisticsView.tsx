@@ -3,49 +3,70 @@ import { Box, Container, Divider, Paper, Stack, Typography } from '@mui/material
 import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid'
 
 import type { DailyStatistic } from '../data/dailyStatistics.js'
-import { DailyStatisticsGrid } from './DailyStatisticsGrid.js'
-import { DateRangeFilter, type DateRange } from './DateRangeFilter.js'
+import {
+  DailyStatisticsDisplay,
+  type StatisticsDisplay,
+} from './DailyStatisticsDisplay.js'
+import type { DateRange } from './DateRangeFilter.js'
 
 interface DailyStatisticsViewProps {
-  dateInputs: DateRange
-  invalidDateRange: boolean
+  month: string
+  latestMonth: string
   rows: DailyStatistic[]
   rowCount: number
   pagination: GridPaginationModel
   sortModel: GridSortModel
   loading: boolean
   error: boolean
-  onDateInputsChange: (dateRange: DateRange) => void
-  onApplyDateRange: () => void
-  onClearDateRange: () => void
+  display: StatisticsDisplay
+  dateRange: DateRange
+  invalidDateRange: boolean
+  onMonthChange: (month: string) => void
+  onDateRangeChange: (dateRange: DateRange) => void
+  onDateRangeApply: () => void
+  onDateRangeClear: () => void
   onPaginationChange: (pagination: GridPaginationModel) => void
   onSortChange: (sortModel: GridSortModel) => void
   onRetry: () => void
+  onDisplayChange: (display: StatisticsDisplay) => void
 }
 
 export function DailyStatisticsView({
-  dateInputs,
-  invalidDateRange,
+  month,
+  latestMonth,
   rows,
   rowCount,
   pagination,
   sortModel,
   loading,
   error,
-  onDateInputsChange,
-  onApplyDateRange,
-  onClearDateRange,
+  display,
+  dateRange,
+  invalidDateRange,
+  onMonthChange,
+  onDateRangeChange,
+  onDateRangeApply,
+  onDateRangeClear,
   onPaginationChange,
   onSortChange,
   onRetry,
+  onDisplayChange,
 }: DailyStatisticsViewProps) {
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        minHeight: { xs: '100vh', md: 900 },
+        height: { md: '100vh' },
+        display: { md: 'flex' },
+        flexDirection: { md: 'column' },
+        bgcolor: 'background.default',
+      }}
+    >
       <Box sx={{ height: 5, bgcolor: 'primary.main' }} />
       <Container
         component="header"
         maxWidth="xl"
-        sx={{ py: { xs: 2.5, md: 3.5 } }}
+        sx={{ py: { xs: 2.5, md: 1.5 } }}
       >
         <Stack
           direction="row"
@@ -73,8 +94,18 @@ export function DailyStatisticsView({
 
       <Divider />
 
-      <Container component="main" maxWidth="xl" sx={{ py: { xs: 5, md: 8 } }}>
-        <Box sx={{ maxWidth: 900, mb: { xs: 5, md: 7 } }}>
+      <Container
+        component="main"
+        maxWidth="xl"
+        sx={{
+          py: { xs: 5, md: 3 },
+          display: { md: 'flex' },
+          flex: { md: 1 },
+          flexDirection: { md: 'column' },
+          minHeight: 0,
+        }}
+      >
+        <Box sx={{ maxWidth: 900, mb: { xs: 5, md: 3 } }}>
           <Typography
             component="p"
             color="primary.main"
@@ -82,7 +113,7 @@ export function DailyStatisticsView({
               fontWeight: 600,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
-              mb: 2,
+              mb: { xs: 2, md: 1 },
             }}
           >
             Finland / Power system
@@ -90,7 +121,7 @@ export function DailyStatisticsView({
           <Typography
             component="h1"
             variant="h1"
-            sx={{ fontSize: { xs: '3rem', sm: '4.5rem', md: '6rem' } }}
+            sx={{ fontSize: { xs: '3rem', sm: '4.5rem', md: '3.75rem' } }}
           >
             Electricity,
             <Box component="span" sx={{ color: 'text.secondary' }}>
@@ -103,7 +134,7 @@ export function DailyStatisticsView({
             sx={{
               fontSize: { xs: '1rem', md: '1.15rem' },
               maxWidth: 660,
-              mt: 3,
+              mt: { xs: 3, md: 1 },
             }}
           >
             Compare daily averages calculated from hourly production,
@@ -113,26 +144,35 @@ export function DailyStatisticsView({
 
         <Paper
           variant="outlined"
-          sx={{ overflow: 'hidden', bgcolor: 'background.paper' }}
+          sx={{
+            overflow: 'hidden',
+            bgcolor: 'background.paper',
+            display: { md: 'flex' },
+            flex: { md: 1 },
+            flexDirection: { md: 'column' },
+            minHeight: { md: 0 },
+          }}
         >
-          <DateRangeFilter
-            dateRange={dateInputs}
-            invalid={invalidDateRange}
-            onChange={onDateInputsChange}
-            onApply={onApplyDateRange}
-            onClear={onClearDateRange}
-          />
-          <Divider />
-          <DailyStatisticsGrid
+          <DailyStatisticsDisplay
+            display={display}
+            month={month}
+            latestMonth={latestMonth}
             rows={rows}
             rowCount={rowCount}
             pagination={pagination}
             sortModel={sortModel}
             loading={loading}
             error={error}
+            dateRange={dateRange}
+            invalidDateRange={invalidDateRange}
             onPaginationChange={onPaginationChange}
             onSortChange={onSortChange}
             onRetry={onRetry}
+            onDisplayChange={onDisplayChange}
+            onMonthChange={onMonthChange}
+            onDateRangeChange={onDateRangeChange}
+            onDateRangeApply={onDateRangeApply}
+            onDateRangeClear={onDateRangeClear}
           />
         </Paper>
       </Container>

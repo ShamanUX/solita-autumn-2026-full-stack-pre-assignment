@@ -1,6 +1,5 @@
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined'
-import RefreshIcon from '@mui/icons-material/Refresh'
-import { Alert, Box, Button, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import {
   DataGrid,
   type GridColDef,
@@ -71,10 +70,8 @@ interface DailyStatisticsGridProps {
   pagination: GridPaginationModel
   sortModel: GridSortModel
   loading: boolean
-  error: boolean
   onPaginationChange: (pagination: GridPaginationModel) => void
   onSortChange: (sortModel: GridSortModel) => void
-  onRetry: () => void
 }
 
 function EmptyResults() {
@@ -107,87 +104,42 @@ export function DailyStatisticsGrid({
   pagination,
   sortModel,
   loading,
-  error,
   onPaginationChange,
   onSortChange,
-  onRetry,
 }: DailyStatisticsGridProps) {
   return (
-    <>
-      <Box sx={{ p: { xs: 2.5, md: 3 }, pb: '0 !important' }}>
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1}
-          sx={{ justifyContent: 'space-between' }}
-        >
-          <Box>
-            <Typography variant="h2" sx={{ fontSize: '1.5rem' }}>
-              Daily statistics
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mt: 0.5 }}
-            >
-              Averages are displayed in the source data units.
-            </Typography>
-          </Box>
-          <Typography
-            color="text.secondary"
-            aria-live="polite"
-            sx={{ fontSize: '0.875rem' }}
-          >
-            {loading ? 'Loading records...' : `${rowCount} days found`}
-          </Typography>
-        </Stack>
-      </Box>
-
-      {error ? (
-        <Alert
-          severity="error"
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              startIcon={<RefreshIcon />}
-              onClick={onRetry}
-            >
-              Retry
-            </Button>
-          }
-          sx={{ m: 3 }}
-        >
-          Daily statistics could not be loaded.
-        </Alert>
-      ) : (
-        <Box sx={{ height: 575, mt: 2, minWidth: 0 }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            getRowId={(row) => row.date}
-            loading={loading}
-            rowCount={rowCount}
-            paginationMode="server"
-            sortingMode="server"
-            paginationModel={pagination}
-            onPaginationModelChange={onPaginationChange}
-            sortModel={sortModel}
-            onSortModelChange={onSortChange}
-            pageSizeOptions={[5, 10, 20]}
-            disableRowSelectionOnClick
-            slots={{ noRowsOverlay: EmptyResults }}
-            sx={{
-              border: 0,
-              borderTop: 1,
-              borderColor: 'divider',
-              '& .MuiDataGrid-columnHeaders': { bgcolor: '#171818' },
-              '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
-                outlineColor: 'primary.main',
-              },
-            }}
-          />
-        </Box>
-      )}
-    </>
+    <Box
+      sx={{
+        height: 629,
+        mt: 2,
+        minWidth: 0,
+      }}
+    >
+      <DataGrid
+        rows={rows}
+        rowCount={rowCount}
+        columns={columns}
+        getRowId={(row) => row.date}
+        loading={loading}
+        paginationModel={pagination}
+        onPaginationModelChange={onPaginationChange}
+        paginationMode="server"
+        sortModel={sortModel}
+        onSortModelChange={onSortChange}
+        sortingMode="server"
+        pageSizeOptions={[10]}
+        disableRowSelectionOnClick
+        slots={{ noRowsOverlay: EmptyResults }}
+        sx={{
+          border: 0,
+          borderTop: 1,
+          borderColor: 'divider',
+          '& .MuiDataGrid-columnHeaders': { bgcolor: '#171818' },
+          '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus': {
+            outlineColor: 'primary.main',
+          },
+        }}
+      />
+    </Box>
   )
 }
