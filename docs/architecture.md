@@ -39,6 +39,14 @@ normalizes production and consumption to MWh, retains prices in c/kWh, and
 represents missing measurements as `null`. A separate health service verifies
 that the database is connected and contains the supplied data.
 
+The daily overview calculates consecutive negative-price periods in PostgreSQL
+with a gaps-and-islands window query. Negative observations remain in one group
+only while their timestamps are exactly one hour apart. Positive, zero, null,
+and missing hourly observations therefore split streaks. The longest group is
+joined to the daily aggregates and can be sorted like the other overview
+columns. A day with observed prices but no negative price returns zero hours; a
+day without any price observations returns `null`.
+
 ## Frontend
 
 The React frontend separates stateful container logic, presentational

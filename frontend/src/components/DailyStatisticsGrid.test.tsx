@@ -13,6 +13,7 @@ const defaultProps = {
       totalProduction: 729494,
       totalConsumption: 110901,
       averagePrice: 9.087,
+      longestNegativePriceStreakHours: 4,
     },
   ],
   rowCount: 1,
@@ -48,9 +49,33 @@ describe('DailyStatisticsGrid', () => {
       screen.getByRole('columnheader', { name: 'Price average (c/kWh)' }),
     ).toBeInTheDocument()
     expect(
+      screen.getByRole('columnheader', {
+        name: 'Longest negative-price streak (h)',
+      }),
+    ).toBeInTheDocument()
+    expect(
       screen.getByText((content) => content.replace(/\s/g, '') === '729494'),
     ).toBeInTheDocument()
     expect(screen.getByText('9,087')).toBeInTheDocument()
+    expect(screen.getByText('4')).toBeInTheDocument()
+  })
+
+  it('shows unavailable values instead of localized non-numbers', () => {
+    render(
+      <DailyStatisticsGrid
+        {...defaultProps}
+        rows={[
+          {
+            ...defaultProps.rows[0]!,
+            averagePrice: Number.NaN,
+            longestNegativePriceStreakHours: null,
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getAllByText('Not available')).toHaveLength(2)
+    expect(screen.queryByText(/epäluku/i)).not.toBeInTheDocument()
   })
 
   it('opens the selected day', async () => {

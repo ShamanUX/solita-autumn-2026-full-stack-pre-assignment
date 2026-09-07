@@ -30,6 +30,15 @@ function formatDate(value: string) {
   return dateFormatter.format(new Date(`${value}T00:00:00Z`))
 }
 
+function formatNumber(
+  value: number | null | undefined,
+  formatter: Intl.NumberFormat,
+) {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? formatter.format(value)
+    : 'Not available'
+}
+
 export function DailyStatisticsChart({
   rows,
   loading,
@@ -67,13 +76,14 @@ export function DailyStatisticsChart({
               id: 'electricity',
               position: 'left',
               valueFormatter: (value: number) =>
-                axisNumberFormatter.format(value),
+                formatNumber(value, axisNumberFormatter),
             },
             {
               id: 'price',
               position: 'right',
               width: 'auto',
-              valueFormatter: (value: number) => priceFormatter.format(value),
+              valueFormatter: (value: number) =>
+                formatNumber(value, priceFormatter),
             },
           ]}
           series={[
@@ -83,7 +93,7 @@ export function DailyStatisticsChart({
               yAxisId: 'electricity',
               color: '#d7ff3f',
               valueFormatter: (value) =>
-                value === null ? 'Not available' : valueFormatter.format(value),
+                formatNumber(value, valueFormatter),
             },
             {
               dataKey: 'totalConsumption',
@@ -91,7 +101,7 @@ export function DailyStatisticsChart({
               yAxisId: 'electricity',
               color: '#66c7f2',
               valueFormatter: (value) =>
-                value === null ? 'Not available' : valueFormatter.format(value),
+                formatNumber(value, valueFormatter),
             },
             {
               dataKey: 'averagePrice',
@@ -99,7 +109,7 @@ export function DailyStatisticsChart({
               yAxisId: 'price',
               color: '#ff6b35',
               valueFormatter: (value) =>
-                value === null ? 'Not available' : priceFormatter.format(value),
+                formatNumber(value, priceFormatter),
             },
           ]}
           grid={{ horizontal: true }}

@@ -21,6 +21,7 @@ const page = {
       totalProduction: 718585,
       totalConsumption: 96803,
       averagePrice: 1.044,
+      longestNegativePriceStreakHours: 0,
     },
   ],
   total: 1,

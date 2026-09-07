@@ -39,16 +39,31 @@ interface SingleDayDetailsProps {
   onRetry: () => void
 }
 
-function formatValue(value: number | null) {
-  return value === null ? 'Not available' : numberFormatter.format(value)
+function formatValue(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? numberFormatter.format(value)
+    : 'Not available'
 }
 
-function formatPrice(value: number | null) {
-  return value === null ? 'Not available' : priceFormatter.format(value)
+function formatPrice(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? priceFormatter.format(value)
+    : 'Not available'
 }
 
 function formatTime(startTime: string) {
   return startTime.slice(11, 16)
+}
+
+function formatPeakConsumptionRatio(
+  hour: DailyStatisticDetail['peakConsumptionRatioHour'],
+) {
+  if (hour === null || !Number.isFinite(hour.consumptionProductionRatio)) {
+    return 'Not available'
+  }
+
+  const ratio = ratioFormatter.format(hour.consumptionProductionRatio)
+  return `${ratio}x at ${formatTime(hour.startTime)}`
 }
 
 export function SingleDayDetails({
@@ -134,9 +149,7 @@ export function SingleDayDetails({
               ['Average price (c/kWh)', formatPrice(detail.averagePrice)],
               [
                 'Highest consumption / production',
-                detail.peakConsumptionRatioHour === null
-                  ? 'Not available'
-                  : `${ratioFormatter.format(detail.peakConsumptionRatioHour.consumptionProductionRatio)}x at ${formatTime(detail.peakConsumptionRatioHour.startTime)}`,
+                formatPeakConsumptionRatio(detail.peakConsumptionRatioHour),
               ],
             ].map(([label, value]) => (
               <Box

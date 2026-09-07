@@ -60,8 +60,11 @@ describe('SingleDayDetails', () => {
         date={detail.date}
         detail={{
           ...detail,
-          totalConsumption: null,
-          peakConsumptionRatioHour: null,
+          totalConsumption: Number.NaN,
+          peakConsumptionRatioHour: {
+            ...detail.peakConsumptionRatioHour,
+            consumptionProductionRatio: Number.NaN,
+          },
           cheapestHours: [],
         }}
         loading={false}
@@ -72,6 +75,7 @@ describe('SingleDayDetails', () => {
     )
 
     expect(screen.getAllByText('Not available')).toHaveLength(2)
+    expect(screen.queryByText(/epäluku/i)).not.toBeInTheDocument()
     expect(
       screen.getByText('Price observations are not available for this day.'),
     ).toBeInTheDocument()

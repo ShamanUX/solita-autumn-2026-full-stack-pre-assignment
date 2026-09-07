@@ -72,7 +72,6 @@ export function DailyStatisticsPage({
     <Box
       sx={{
         minHeight: { xs: '100vh', md: 900 },
-        height: { md: '100vh' },
         display: { md: 'flex' },
         flexDirection: { md: 'column' },
         bgcolor: 'background.default',

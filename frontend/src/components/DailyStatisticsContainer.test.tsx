@@ -145,6 +145,7 @@ const statistic = {
   totalProduction: 729494,
   totalConsumption: 110901,
   averagePrice: 9.087,
+  longestNegativePriceStreakHours: 4,
 }
 
 const detail = {
