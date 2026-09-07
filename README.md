@@ -8,7 +8,7 @@ The planned stack is React and TypeScript for the frontend, Node.js and
 TypeScript for the backend, and the provided PostgreSQL database. The initial
 technical plan is available in [docs/architecture-planning.md](docs/architecture-planning.md).
 
-## Running the backend
+## Running the backend locally
 
 Docker Desktop and Node.js 22 or newer are required. Start PostgreSQL, the
 Feathers API, and Adminer with:
