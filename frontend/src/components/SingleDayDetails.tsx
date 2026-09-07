@@ -30,7 +30,7 @@ const dateFormatter = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
 })
 
-interface SingleDayViewProps {
+interface SingleDayDetailsProps {
   date: string
   detail: DailyStatisticDetail | null
   loading: boolean
@@ -51,14 +51,14 @@ function formatTime(startTime: string) {
   return startTime.slice(11, 16)
 }
 
-export function SingleDayView({
+export function SingleDayDetails({
   date,
   detail,
   loading,
   error,
   onBack,
   onRetry,
-}: SingleDayViewProps) {
+}: SingleDayDetailsProps) {
   return (
     <Box sx={{ overflowY: 'auto', p: { xs: 2.5, md: 3 } }}>
       <Stack

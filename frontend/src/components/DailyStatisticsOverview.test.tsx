@@ -2,7 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { DailyStatisticsDisplay } from './DailyStatisticsDisplay.js'
+import { DailyStatisticsOverview } from './DailyStatisticsOverview.js'
 
 vi.mock('./DailyStatisticsChart.js', () => ({
   DailyStatisticsChart: () => (
@@ -19,7 +19,7 @@ vi.mock('./MonthSelector.js', () => ({
 afterEach(cleanup)
 
 const defaultProps = {
-  display: 'table' as const,
+  mode: 'table' as const,
   month: '2024-09',
   latestMonth: '2024-09',
   rows: [],
@@ -30,7 +30,7 @@ const defaultProps = {
   error: false,
   dateRange: { from: '', to: '' },
   invalidDateRange: false,
-  onDisplayChange: vi.fn(),
+  onModeChange: vi.fn(),
   onMonthChange: vi.fn(),
   onDateRangeChange: vi.fn(),
   onDateRangeApply: vi.fn(),
@@ -41,29 +41,29 @@ const defaultProps = {
   onDaySelect: vi.fn(),
 }
 
-describe('DailyStatisticsDisplay', () => {
-  it('reports graph and table display changes', async () => {
+describe('DailyStatisticsOverview', () => {
+  it('reports graph and table mode changes', async () => {
     const user = userEvent.setup()
-    const onDisplayChange = vi.fn()
+    const onModeChange = vi.fn()
     const { rerender } = render(
-      <DailyStatisticsDisplay
+      <DailyStatisticsOverview
         {...defaultProps}
-        onDisplayChange={onDisplayChange}
+        onModeChange={onModeChange}
       />,
     )
 
     await user.click(screen.getByRole('button', { name: 'Graph' }))
-    expect(onDisplayChange).toHaveBeenCalledWith('graph')
+    expect(onModeChange).toHaveBeenCalledWith('graph')
     expect(screen.getByRole('group', { name: 'From' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'August 2024' }),
     ).not.toBeInTheDocument()
 
     rerender(
-      <DailyStatisticsDisplay
+      <DailyStatisticsOverview
         {...defaultProps}
-        display="graph"
-        onDisplayChange={onDisplayChange}
+        mode="graph"
+        onModeChange={onModeChange}
       />,
     )
     expect(
@@ -79,20 +79,20 @@ describe('DailyStatisticsDisplay', () => {
     expect(defaultProps.onMonthChange).toHaveBeenCalledWith('2024-08')
 
     await user.click(screen.getByRole('button', { name: 'Data table' }))
-    expect(onDisplayChange).toHaveBeenLastCalledWith('table')
+    expect(onModeChange).toHaveBeenLastCalledWith('table')
   })
 
   it('displays loading, result, and error states', async () => {
     const user = userEvent.setup()
     const onRetry = vi.fn()
     const { rerender } = render(
-      <DailyStatisticsDisplay {...defaultProps} loading />,
+      <DailyStatisticsOverview {...defaultProps} loading />,
     )
 
     expect(screen.getByText('Loading records...')).toBeInTheDocument()
 
     rerender(
-      <DailyStatisticsDisplay {...defaultProps} error onRetry={onRetry} />,
+      <DailyStatisticsOverview {...defaultProps} error onRetry={onRetry} />,
     )
     expect(screen.getByText('0 days found')).toBeInTheDocument()
     expect(

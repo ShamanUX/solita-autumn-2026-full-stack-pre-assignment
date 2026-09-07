@@ -18,10 +18,10 @@ import { DailyStatisticsGrid } from './DailyStatisticsGrid.js'
 import { DateRangeFilter, type DateRange } from './DateRangeFilter.js'
 import { MonthSelector } from './MonthSelector.js'
 
-export type StatisticsDisplay = 'graph' | 'table'
+export type StatisticsMode = 'graph' | 'table'
 
-interface DailyStatisticsDisplayProps {
-  display: StatisticsDisplay
+interface DailyStatisticsOverviewProps {
+  mode: StatisticsMode
   month: string
   latestMonth: string
   rows: DailyStatistic[]
@@ -32,7 +32,7 @@ interface DailyStatisticsDisplayProps {
   error: boolean
   dateRange: DateRange
   invalidDateRange: boolean
-  onDisplayChange: (display: StatisticsDisplay) => void
+  onModeChange: (mode: StatisticsMode) => void
   onMonthChange: (month: string) => void
   onDateRangeChange: (dateRange: DateRange) => void
   onDateRangeApply: () => void
@@ -43,8 +43,8 @@ interface DailyStatisticsDisplayProps {
   onDaySelect: (date: string) => void
 }
 
-export function DailyStatisticsDisplay({
-  display,
+export function DailyStatisticsOverview({
+  mode,
   month,
   latestMonth,
   rows,
@@ -55,7 +55,7 @@ export function DailyStatisticsDisplay({
   error,
   dateRange,
   invalidDateRange,
-  onDisplayChange,
+  onModeChange,
   onMonthChange,
   onDateRangeChange,
   onDateRangeApply,
@@ -64,7 +64,7 @@ export function DailyStatisticsDisplay({
   onSortChange,
   onRetry,
   onDaySelect,
-}: DailyStatisticsDisplayProps) {
+}: DailyStatisticsOverviewProps) {
   return (
     <Box
       sx={{
@@ -82,7 +82,7 @@ export function DailyStatisticsDisplay({
         >
           <Box>
             <Typography variant="h2" sx={{ fontSize: '1.5rem' }}>
-              {display === 'graph'
+              {mode === 'graph'
                 ? 'Daily statistics by month.'
                 : 'Daily statistics'}
             </Typography>
@@ -93,7 +93,7 @@ export function DailyStatisticsDisplay({
             >
               {loading
                 ? 'Loading records...'
-                : `${display === 'table' ? rowCount : rows.length} days found`}
+                : `${mode === 'table' ? rowCount : rows.length} days found`}
             </Typography>
           </Box>
           <Stack
@@ -101,7 +101,7 @@ export function DailyStatisticsDisplay({
             spacing={1.5}
             sx={{ alignItems: { sm: 'center' } }}
           >
-            {display === 'graph' && (
+            {mode === 'graph' && (
               <MonthSelector
                 month={month}
                 latestMonth={latestMonth}
@@ -109,12 +109,12 @@ export function DailyStatisticsDisplay({
               />
             )}
             <ToggleButtonGroup
-              value={display}
+              value={mode}
               exclusive
               size="small"
               aria-label="Statistics display"
-              onChange={(_event, value: StatisticsDisplay | null) => {
-                if (value) onDisplayChange(value)
+              onChange={(_event, value: StatisticsMode | null) => {
+                if (value) onModeChange(value)
               }}
             >
               <ToggleButton value="graph" aria-label="Graph">
@@ -130,7 +130,7 @@ export function DailyStatisticsDisplay({
         </Stack>
       </Box>
 
-      {display === 'table' && (
+      {mode === 'table' && (
         <DateRangeFilter
           dateRange={dateRange}
           invalid={invalidDateRange}
@@ -157,7 +157,7 @@ export function DailyStatisticsDisplay({
         >
           Daily statistics could not be loaded.
         </Alert>
-      ) : display === 'graph' ? (
+      ) : mode === 'graph' ? (
         <DailyStatisticsChart
           rows={rows}
           loading={loading}
