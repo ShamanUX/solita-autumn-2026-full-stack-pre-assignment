@@ -116,7 +116,7 @@ export function DailyStatisticsChart({
       <Typography
         variant="body2"
         color="text.secondary"
-        sx={{ px: { xs: 2.5, md: 3 }, pb: 2 }}
+        sx={{ px: { xs: 2.5, md: 3 }, pb: 2, mt: 4 }}
       >
         Select a plotted day to view its totals and hourly insights.
       </Typography>
