@@ -142,28 +142,28 @@ const mockedGetDailyStatisticDetail = vi.mocked(getDailyStatisticDetail)
 
 const statistic = {
   date: '2024-09-20',
-  averageProduction: 30395.6,
-  averageConsumption: 4620873,
+  averageProduction: 30396,
+  averageConsumption: 4621,
   averagePrice: 9.087,
 }
 
 const detail = {
   date: statistic.date,
-  totalProduction: 729494.4,
-  totalConsumption: 110900952,
+  totalProduction: 729494,
+  totalConsumption: 110901,
   averagePrice: 9.087,
   peakConsumptionRatioHour: {
     startTime: '2024-09-20T09:00:00',
     production: 22908.13,
-    consumption: 4963616.432,
+    consumption: 4963.616432,
     price: 18.824,
-    consumptionProductionRatio: 216.68,
+    consumptionProductionRatio: 0.217,
   },
   cheapestHours: [
     {
       startTime: '2024-09-20T00:00:00',
       production: 34029.69,
-      consumption: 3766928.185,
+      consumption: 3766.928185,
       price: 0.872,
     },
   ],
@@ -334,7 +334,9 @@ describe('DailyStatisticsContainer', () => {
 
     await user.click(screen.getByRole('button', { name: 'View day' }))
 
-    expect(await screen.findByText('Total consumption')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Total consumption (MWh)'),
+    ).toBeInTheDocument()
     expect(mockedGetDailyStatisticDetail).toHaveBeenCalledWith('2024-09-20')
 
     await user.click(
@@ -354,7 +356,9 @@ describe('DailyStatisticsContainer', () => {
     await screen.findByRole('button', { name: 'Month 2024-09' })
     await user.click(screen.getByRole('button', { name: 'Open graph day' }))
 
-    expect(await screen.findByText('Total consumption')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Total consumption (MWh)'),
+    ).toBeInTheDocument()
     await user.click(
       screen.getByRole('button', { name: 'Back to daily statistics' }),
     )
@@ -378,7 +382,9 @@ describe('DailyStatisticsContainer', () => {
     ).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Retry' }))
 
-    expect(await screen.findByText('Total production')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Total production (MWh)'),
+    ).toBeInTheDocument()
     expect(mockedGetDailyStatisticDetail).toHaveBeenCalledTimes(2)
   })
 })

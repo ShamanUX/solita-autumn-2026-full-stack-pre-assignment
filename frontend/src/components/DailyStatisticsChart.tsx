@@ -3,14 +3,14 @@ import { LineChart } from '@mui/x-charts/LineChart'
 
 import type { DailyStatistic } from '../data/dailyStatistics.js'
 
-const axisNumberFormatter = new Intl.NumberFormat('en-FI', {
+const axisNumberFormatter = new Intl.NumberFormat('fi-FI', {
   notation: 'compact',
   maximumFractionDigits: 1,
 })
-const valueFormatter = new Intl.NumberFormat('en-FI', {
-  maximumFractionDigits: 1,
+const valueFormatter = new Intl.NumberFormat('fi-FI', {
+  maximumFractionDigits: 0,
 })
-const priceFormatter = new Intl.NumberFormat('en-FI', {
+const priceFormatter = new Intl.NumberFormat('fi-FI', {
   minimumFractionDigits: 3,
   maximumFractionDigits: 3,
 })
@@ -72,13 +72,14 @@ export function DailyStatisticsChart({
             {
               id: 'price',
               position: 'right',
+              width: 'auto',
               valueFormatter: (value: number) => priceFormatter.format(value),
             },
           ]}
           series={[
             {
               dataKey: 'averageProduction',
-              label: 'Production average',
+              label: 'Production average (MWh)',
               yAxisId: 'electricity',
               color: '#d7ff3f',
               valueFormatter: (value) =>
@@ -86,7 +87,7 @@ export function DailyStatisticsChart({
             },
             {
               dataKey: 'averageConsumption',
-              label: 'Consumption average',
+              label: 'Consumption average (MWh)',
               yAxisId: 'electricity',
               color: '#66c7f2',
               valueFormatter: (value) =>
@@ -94,7 +95,7 @@ export function DailyStatisticsChart({
             },
             {
               dataKey: 'averagePrice',
-              label: 'Price average',
+              label: 'Price average (c/kWh)',
               yAxisId: 'price',
               color: '#ff6b35',
               valueFormatter: (value) =>
@@ -116,7 +117,7 @@ export function DailyStatisticsChart({
       <Typography
         variant="body2"
         color="text.secondary"
-        sx={{ px: { xs: 2.5, md: 3 }, pb: 2, mt: 4 }}
+        sx={{ px: { xs: 2.5, md: 3 }, pb: 2, mt: { md: 4, xs: 8 } }}
       >
         Select a plotted day to view its totals and hourly insights.
       </Typography>

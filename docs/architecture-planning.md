@@ -27,6 +27,9 @@ date and calculates averages for the available production, consumption, and
 price observations. Its REST endpoint provides inclusive date filtering,
 server-side pagination, and allowlisted single-column ordering. Missing
 measurements remain `null` rather than being treated as zero.
+Source consumption values are converted from kWh to MWh at the service
+boundary so production and consumption use a common scale in API responses.
+Prices remain in their source c/kWh unit.
 
 The same service exposes `GET /daily-statistics/:date` for a single-day detail.
 It returns ordered hourly observations, production and consumption sums, the

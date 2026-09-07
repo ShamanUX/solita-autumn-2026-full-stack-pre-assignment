@@ -19,14 +19,14 @@ afterEach(() => {
 const rows = [
   {
     date: '2024-09-20',
-    averageProduction: 30395.6,
-    averageConsumption: 4620873,
+    averageProduction: 30396,
+    averageConsumption: 4621,
     averagePrice: 9.087,
   },
   {
     date: '2024-09-19',
-    averageProduction: 29880.2,
-    averageConsumption: 4510220,
+    averageProduction: 29880,
+    averageConsumption: 4510,
     averagePrice: 8.942,
   },
 ]
@@ -46,6 +46,11 @@ describe('DailyStatisticsChart', () => {
       | {
           dataset: Array<Record<string, unknown>>
           series: Array<{ label: string; yAxisId: string }>
+          yAxis: Array<{
+            id: string
+            position: string
+            width?: number | 'auto'
+          }>
           onAxisClick: (
             event: unknown,
             data: { axisValue?: string | number | Date | null } | null,
@@ -57,14 +62,23 @@ describe('DailyStatisticsChart', () => {
       '2024-09-19',
       '2024-09-20',
     ])
+    expect(props?.yAxis).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'price',
+          position: 'right',
+          width: 'auto',
+        }),
+      ]),
+    )
     expect(props?.series).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: 'Production average',
+          label: 'Production average (MWh)',
           yAxisId: 'electricity',
         }),
         expect.objectContaining({
-          label: 'Price average',
+          label: 'Price average (c/kWh)',
           yAxisId: 'price',
         }),
       ]),

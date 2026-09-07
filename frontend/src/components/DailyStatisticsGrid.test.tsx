@@ -10,8 +10,8 @@ const defaultProps = {
   rows: [
     {
       date: '2024-09-20',
-      averageProduction: 30395.6,
-      averageConsumption: 4620873,
+      averageProduction: 30396,
+      averageConsumption: 4621,
       averagePrice: 9.087,
     },
   ],
@@ -29,6 +29,28 @@ describe('DailyStatisticsGrid', () => {
     render(<DailyStatisticsGrid {...defaultProps} />)
 
     expect(screen.getByText('20 Sept 2024')).toBeInTheDocument()
+  })
+
+  it('shows units and Finnish-formatted values', () => {
+    render(<DailyStatisticsGrid {...defaultProps} />)
+
+    expect(
+      screen.getByRole('columnheader', {
+        name: 'Production average (MWh)',
+      }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('columnheader', {
+        name: 'Consumption average (MWh)',
+      }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('columnheader', { name: 'Price average (c/kWh)' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText((content) => content.replace(/\s/g, '') === '30396'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('9,087')).toBeInTheDocument()
   })
 
   it('opens the selected day', async () => {

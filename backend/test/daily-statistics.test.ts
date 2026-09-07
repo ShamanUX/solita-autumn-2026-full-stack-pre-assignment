@@ -29,7 +29,7 @@ describe('daily statistics service', () => {
     expect(result.data).toHaveLength(10)
     expect(result.data[0]).toEqual({
       date: '2024-10-01',
-      averageProduction: 34251.5,
+      averageProduction: 34252,
       averageConsumption: null,
       averagePrice: 5.83,
     })
@@ -48,7 +48,7 @@ describe('daily statistics service', () => {
         {
           date: '2024-09-01',
           averageProduction: 29941,
-          averageConsumption: 4033477.7,
+          averageConsumption: 4033,
           averagePrice: 1.044,
         },
       ],
@@ -62,18 +62,18 @@ describe('daily statistics service', () => {
     expect(result).toMatchObject({
       date: '2024-09-01',
       totalProduction: 718585,
-      totalConsumption: 96803463.9,
+      totalConsumption: 96803,
       averagePrice: 1.044,
       peakConsumptionRatioHour: {
         startTime: '2024-09-01T10:00:00',
-        consumptionProductionRatio: 151.32,
+        consumptionProductionRatio: 0.151,
       },
     })
     expect(result.hours).toHaveLength(24)
     expect(result.hours[0]).toEqual({
       startTime: '2024-09-01T00:00:00',
       production: 30687.35,
-      consumption: 3456794.951,
+      consumption: 3456.794951,
       price: 0,
     })
     expect(result.cheapestHours).toHaveLength(5)
@@ -128,7 +128,7 @@ describe('daily statistics service', () => {
         averageConsumption,
       })),
     ).toEqual([
-      { date: '2023-08-01', averageConsumption: 4219977.2 },
+      { date: '2023-08-01', averageConsumption: 4220 },
       { date: '2023-07-31', averageConsumption: null },
     ])
   })
