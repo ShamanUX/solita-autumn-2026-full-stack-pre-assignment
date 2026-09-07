@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { createApp } from '../src/app.js'
+import { createApp } from '../src/application.js'
 
 const app = createApp()
 let server: Awaited<ReturnType<typeof app.listen>>
