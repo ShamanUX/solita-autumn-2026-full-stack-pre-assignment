@@ -47,11 +47,16 @@ describe('DailyStatisticsChart', () => {
     const props = lineChartMock.mock.calls[0]?.[0] as
       | {
           dataset: Array<Record<string, unknown>>
-          series: Array<{ label: string; yAxisId: string }>
+          series: Array<{
+            label: string
+            yAxisId: string
+            valueFormatter: (value: number | null) => string
+          }>
           yAxis: Array<{
             id: string
             position: string
             width?: number | 'auto'
+            valueFormatter: (value: number) => string
           }>
           onAxisClick: (
             event: unknown,
@@ -87,5 +92,16 @@ describe('DailyStatisticsChart', () => {
     )
     props?.onAxisClick({}, { axisValue: '2024-09-19' })
     expect(onDaySelect).toHaveBeenCalledWith('2024-09-19')
+
+    expect(
+      props?.yAxis.find((axis) => axis.id === 'electricity')?.valueFormatter(
+        Number.NaN,
+      ),
+    ).toBe('Not available')
+    expect(
+      props?.series
+        .find((series) => series.label === 'Total production (MWh)')
+        ?.valueFormatter(Number.NaN),
+    ).toBe('Not available')
   })
 })

@@ -60,20 +60,22 @@ describe('DailyStatisticsGrid', () => {
     expect(screen.getByText('4')).toBeInTheDocument()
   })
 
-  it('shows an unavailable streak when the day has no price data', () => {
+  it('shows unavailable values instead of localized non-numbers', () => {
     render(
       <DailyStatisticsGrid
         {...defaultProps}
         rows={[
           {
             ...defaultProps.rows[0]!,
+            averagePrice: Number.NaN,
             longestNegativePriceStreakHours: null,
           },
         ]}
       />,
     )
 
-    expect(screen.getByText('Not available')).toBeInTheDocument()
+    expect(screen.getAllByText('Not available')).toHaveLength(2)
+    expect(screen.queryByText(/epäluku/i)).not.toBeInTheDocument()
   })
 
   it('opens the selected day', async () => {

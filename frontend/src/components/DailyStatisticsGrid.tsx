@@ -23,6 +23,15 @@ const dateFormatter = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
 })
 
+function formatValue(
+  value: number | null | undefined,
+  formatter: Intl.NumberFormat,
+) {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? formatter.format(value)
+    : 'Not available'
+}
+
 const columns: GridColDef<DailyStatistic>[] = [
   {
     field: 'date',
@@ -40,7 +49,7 @@ const columns: GridColDef<DailyStatistic>[] = [
     align: 'right',
     headerAlign: 'right',
     valueFormatter: (value: number | null) =>
-      value === null ? 'Not available' : numberFormatter.format(value),
+      formatValue(value, numberFormatter),
   },
   {
     field: 'totalConsumption',
@@ -50,7 +59,7 @@ const columns: GridColDef<DailyStatistic>[] = [
     align: 'right',
     headerAlign: 'right',
     valueFormatter: (value: number | null) =>
-      value === null ? 'Not available' : numberFormatter.format(value),
+      formatValue(value, numberFormatter),
   },
   {
     field: 'averagePrice',
@@ -60,7 +69,7 @@ const columns: GridColDef<DailyStatistic>[] = [
     align: 'right',
     headerAlign: 'right',
     valueFormatter: (value: number | null) =>
-      value === null ? 'Not available' : priceFormatter.format(value),
+      formatValue(value, priceFormatter),
   },
   {
     field: 'longestNegativePriceStreakHours',
@@ -70,7 +79,7 @@ const columns: GridColDef<DailyStatistic>[] = [
     align: 'right',
     headerAlign: 'right',
     valueFormatter: (value: number | null) =>
-      value === null ? 'Not available' : numberFormatter.format(value),
+      formatValue(value, numberFormatter),
   },
 ]
 
