@@ -49,9 +49,9 @@ does not repeat an unchanged query.
 
 `DailyStatisticsDisplay` provides the table/graph switch and renders the active
 mode's loading and error state. Its MUI month picker is shown only for the graph,
-and its date range filter is shown only for the table. The table uses server-side
-pagination and sorting, while the graph keeps electricity values and price on
-separate axes because they use different scales.
+and its MUI date pickers are shown only for the table's date range filter. The
+table uses server-side pagination and sorting, while the graph keeps electricity
+values and price on separate axes because they use different scales.
 
 Selecting a table action or a plotted graph day opens `SingleDayView` in the
 same content panel. The container loads the selected date independently and

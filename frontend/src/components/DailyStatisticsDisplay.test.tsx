@@ -54,7 +54,7 @@ describe('DailyStatisticsDisplay', () => {
 
     await user.click(screen.getByRole('button', { name: 'Graph' }))
     expect(onDisplayChange).toHaveBeenCalledWith('graph')
-    expect(screen.getByLabelText('From')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'From' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'August 2024' }),
     ).not.toBeInTheDocument()
@@ -71,7 +71,9 @@ describe('DailyStatisticsDisplay', () => {
         name: 'Daily electricity statistics graph',
       }),
     ).toBeInTheDocument()
-    expect(screen.queryByLabelText('From')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('group', { name: 'From' }),
+    ).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'August 2024' }))
     expect(defaultProps.onMonthChange).toHaveBeenCalledWith('2024-08')

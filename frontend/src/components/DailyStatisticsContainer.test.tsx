@@ -32,6 +32,58 @@ vi.mock('../data/dailyStatisticDetail.js', async (importOriginal) => {
   }
 })
 
+vi.mock('./DateRangeFilter.js', () => ({
+  DateRangeFilter: ({
+    dateRange,
+    invalid,
+    onChange,
+    onApply,
+    onClear,
+  }: {
+    dateRange: { from: string; to: string }
+    invalid: boolean
+    onChange: (dateRange: { from: string; to: string }) => void
+    onApply: () => void
+    onClear: () => void
+  }) => (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        onApply()
+      }}
+    >
+      <label>
+        From
+        <input
+          aria-label="From"
+          type="date"
+          value={dateRange.from}
+          onChange={(event) =>
+            onChange({ ...dateRange, from: event.target.value })
+          }
+        />
+      </label>
+      <label>
+        To
+        <input
+          aria-label="To"
+          type="date"
+          value={dateRange.to}
+          onChange={(event) =>
+            onChange({ ...dateRange, to: event.target.value })
+          }
+        />
+      </label>
+      <button type="submit" disabled={invalid}>
+        Apply dates
+      </button>
+      <button type="button" onClick={onClear}>
+        Clear
+      </button>
+    </form>
+  ),
+}))
+
 vi.mock('./DailyStatisticsChart.js', () => ({
   DailyStatisticsChart: ({
     rows,
@@ -49,6 +101,25 @@ vi.mock('./DailyStatisticsChart.js', () => ({
     >
       <span role="img" aria-label="Daily electricity statistics graph" />
     </button>
+  ),
+}))
+
+vi.mock('./DailyStatisticsGrid.js', () => ({
+  DailyStatisticsGrid: ({
+    rows,
+    onDaySelect,
+  }: {
+    rows: Array<{ date: string }>
+    onDaySelect: (date: string) => void
+  }) => (
+    <div>
+      {rows.map((row) => (
+        <div key={row.date}>
+          <span>{row.date}</span>
+          <button onClick={() => onDaySelect(row.date)}>View day</button>
+        </div>
+      ))}
+    </div>
   ),
 }))
 
@@ -122,7 +193,7 @@ describe('DailyStatisticsContainer', () => {
 
     expect(screen.getByText('Loading records...')).toBeInTheDocument()
     expect(await screen.findByText('1 days found')).toBeInTheDocument()
-    expect(screen.getByText('20 Sept 2024')).toBeInTheDocument()
+    expect(screen.getByText('2024-09-20')).toBeInTheDocument()
     expect(screen.queryByText(/Month /)).not.toBeInTheDocument()
     expect(mockedGetDailyStatistics).toHaveBeenCalledOnce()
     expect(mockedGetDailyStatistics).toHaveBeenCalledWith({
