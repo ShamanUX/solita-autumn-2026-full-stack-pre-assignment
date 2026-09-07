@@ -4,9 +4,9 @@ This repository contains a web application for exploring Finnish electricity
 production, consumption, and price data. The application is being developed as
 the pre-assignment for Solita Dev Academy Finland Autumn 2026.
 
-The planned stack is React and TypeScript for the frontend, Node.js and
-TypeScript for the backend, and the provided PostgreSQL database. The initial
-technical plan is available in [docs/architecture-planning.md](docs/architecture-planning.md).
+The stack is React and TypeScript for the frontend, Node.js and TypeScript for
+the backend, and the provided PostgreSQL database. See the
+[architecture overview](docs/architecture.md) for the system design.
 
 ## Running the backend locally
 
